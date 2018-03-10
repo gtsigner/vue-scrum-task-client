@@ -1,0 +1,11 @@
+@import "~simditor/styles/simditor.scss";
+
+.simditor {
+  border: none;
+  .simditor-toolbar > ul > li > .toolbar-item {
+    &.active {
+      background: transparent;
+      color: $color-primary;
+    }
+  }
+}
