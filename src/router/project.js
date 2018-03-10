@@ -9,13 +9,31 @@ import ProjectGroupChat from '@/views/project/ProjectGroupChat'
 
 
 import ProjectPosts from '@/views/project/ProjectPosts'
+import ProjectCollection from '@/views/project/ProjectCollection'
+import ProjectMember from '@/views/project/ProjectMember'
+import ProjectAnalytics from '@/views/project/ProjectAnalytics'
 
 const ProjectAppsView = [
   {
     name: 'ProjectPosts',
     path: 'posts',
     component: ProjectPosts//分享
-  }
+  },
+  {
+    name: 'ProjectCollection',
+    path: 'collections',
+    component: ProjectCollection//文件
+  },
+  {
+    name: 'ProjectMember',
+    path: 'members',
+    component: ProjectMember//分享
+  },
+  {
+    name: 'ProjectAnalytics',
+    path: 'analytics',
+    component: ProjectAnalytics//分享
+  },
 ];
 
 export default [

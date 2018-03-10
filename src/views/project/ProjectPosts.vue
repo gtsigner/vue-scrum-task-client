@@ -18,14 +18,16 @@
             <nav class="thin-scroll posts-nav">
               <ul class="posts-list list-unstyled">
                 <loading class="mt-2" v-if="isLoading"></loading>
-                <li @click="" class="active post-item" v-for="pt in posts">
+                <li @click="postId=pt._id"
+                    :class="{'active':pt._id===postId}"
+                    class="post-item" v-for="pt in posts">
                   <section>
                     <img class="avatar img-36 img-circle float-left" src="/static/images/head.jpg" alt="">
                     <div class="post-content">
                       <span class="post-title" v-html="pt.title"></span>
                       <p class="post-info">
                         <span v-html="pt.creator.username"></span>
-                        <time class="time-stamp">2月24日 18:30</time>
+                        <time class="time-stamp" v-html="pt.create_at"></time>
                       </p>
                     </div>
                   </section>
@@ -39,14 +41,21 @@
           </div>
           <div class="wall-right">
             <div class="post-view thin-scroll">
-
+              <div class="post-view-header">
+                <h3 v-html="post.title"></h3>
+              </div>
+              <div v-html="post.content"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <transition name="fade">
-      <create-post-editor :post="newPost" @close="closeCreator" v-if="showCreator"></create-post-editor>
+      <create-post-editor
+        :post="newPost"
+        @close="closeCreator"
+        @submit="submitCreator"
+        v-if="showCreator"></create-post-editor>
     </transition>
   </div>
 </template>
@@ -92,6 +101,11 @@
     right: 0;
     bottom: 0;
     left: 0;
+    .wall-view {
+      background-color: #fff;
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, .1);
+    }
     .wall-left-header {
       line-height: 50px;
       border-bottom: 1px solid $color-border-gary;
@@ -119,6 +133,7 @@
       width: 100%;
       height: 100%;
       overflow-y: auto;
+      padding: 15px;
     }
     .posts-list {
       .post-item {
@@ -128,7 +143,10 @@
         overflow: hidden;
         border-bottom: 1px solid $color-border-gary;
         &:hover, &.active {
-          background: $color-white-f7;
+          color: $color-primary;
+        }
+        &.active {
+          background: #fafafa;
         }
         .avatar {
           display: block;
@@ -163,6 +181,7 @@
       }
     }
   }
+
 </style>
 
 <script>
@@ -181,19 +200,38 @@
       }
     },
     watch: {
-      'postId': () => {
-
+      'postId': function (n, o) {
+        console.log(n);
+        this.loadPost(n);
       }
     },
     methods: {
       closeCreator() {
         this.showCreator = false;
       },
+      submitCreator(post) {
+        console.log(post)
+        if (post._id) {
+          //update
+
+        } else {
+          post._project_id = this.project._id;
+          Api.createPost(post).then((res) => {
+            //在创建完成之后，关闭后重新LoadPosts
+            this.getPosts();
+          });
+          this.showCreator = false;
+        }
+      },
+      /*当是创建Post的时候*/
       createPost() {
+        this.newPost = {title: '', content: ''};
         this.showCreator = true;
       },
-      loadPost() {
-
+      loadPost(n) {
+        Api.post(n).then((post) => {
+          this.post = post;
+        });
       },
       //获取全部分享
       getPosts() {
@@ -201,6 +239,9 @@
           this.posts = [];
           this.posts = [...posts];
           this.isLoading = false;
+          if (this.posts.length > 0) {
+            this.postId = this.posts[0]._id;
+          }
         });
       }
     },
@@ -209,10 +250,7 @@
     },
     data() {
       return {
-        newPost: {
-          title: '',
-          content: '',
-        },
+        newPost: {},
         showCreator: false,
         projectId: this.$route.params.project_id,
         postId: '',

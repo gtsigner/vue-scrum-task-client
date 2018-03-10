@@ -11,10 +11,10 @@
         <div class="modal-body">
           <div class="create-post-view">
             <div class="form-group">
-              <input type="text" class="form-control" placeholder="输入文档标题">
+              <input v-model="post.title" type="text" class="form-control" placeholder="输入文档标题">
             </div>
             <div class="form-group">
-              <textarea id="post-editor" placeholder="输入文档内容" autofocus></textarea>
+              <textarea v-model="post.content" id="post-editor" placeholder="输入文档内容" autofocus></textarea>
             </div>
           </div>
         </div>
@@ -37,9 +37,15 @@
     props: {
       post: {}
     },
+    data() {
+      return {
+        editorType: 'Normal',//[normal,markdown]
+      }
+    },
     methods: {
       loadEditor() {
-        this.editor = new Simditor({
+        console.log(this.editor);
+        this.$editor = new Simditor({
           textarea: document.getElementById('post-editor')
         });
       },
@@ -47,6 +53,7 @@
         this.$emit('close');
       },
       submit() {
+        this.post.content = this.$editor.getValue();
         this.$emit('submit', this.post);
       }
     },

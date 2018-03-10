@@ -92,18 +92,20 @@
         });
       }
     },
-    created() {
-      this.taskList._id = this.$route.params.task_list_id;
-      //同步TaskStages完成后，分别给TaskStages添加task
-      //需要先获取到TaskList
-      Api.taskList({
-        '_project_id': this.$route.params.project_id,
-      }).then((res) => {
-        this.taskList = res[0];
-      });
-      this.$store.dispatch('getTaskStagesAsync', {
-        project_id: this.$route.params.project_id,
-        task_list_id: this.taskList._id
+    mounted() {
+      this.$nextTick(() => {
+        this.taskList._id = this.$route.params.task_list_id;
+        //同步TaskStages完成后，分别给TaskStages添加task
+        //需要先获取到TaskList
+        Api.taskList({
+          '_project_id': this.$route.params.project_id,
+        }).then((res) => {
+          this.taskList = res[0];
+        });
+        this.$store.dispatch('getTaskStagesAsync', {
+          project_id: this.$route.params.project_id,
+          task_list_id: this.taskList._id
+        });
       });
     }
   }

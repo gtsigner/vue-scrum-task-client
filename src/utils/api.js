@@ -180,6 +180,9 @@ export default {
   posts(params) {
     return instance.get(API_URLS.posts.index + '?' + buildQueryString(params));
   },
+  post(_id) {
+    return instance.get(API_URLS.posts.index + '/' + _id);
+  },
   createPost(post) {
     return instance.post(API_URLS.posts.index, post);
   }
