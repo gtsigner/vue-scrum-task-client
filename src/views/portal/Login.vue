@@ -2,7 +2,7 @@
   <div class="pg-login">
     <div class="container">
       <h1 class="text-center app-logo">
-        OeyTeam
+        OeyTeam - 登录
       </h1>
       <div class="row login-form">
         <div>
@@ -14,7 +14,7 @@
                               type="text"
                               v-model="user.username"
                               required
-                              placeholder="用户名 / 邮箱地址">
+                              placeholder="手机号">
                 </b-form-input>
               </b-form-group>
               <b-form-group id="password"
@@ -28,11 +28,22 @@
                 </b-form-input>
               </b-form-group>
               <div class="text-center">
-                <b-button size="lg"
-                          :block="true"
-                          @click="login"
-                          type="button" variant="primary">
+                <b-button
+                  v-if="!isRequest"
+                  size="lg"
+                  :block="true"
+                  @click="login"
+                  type="button" variant="primary">
                   <span>登 录</span>
+                </b-button>
+                <b-button
+                  v-if="isRequest"
+                  class="disabled"
+                  size="lg"
+                  :block="true"
+                  @click="login"
+                  type="button" variant="primary">
+                  <span>登录中...</span>
                 </b-button>
               </div>
             </b-form>
@@ -47,7 +58,8 @@
               <i></i>
             </b-button>
             <p class="link-reg-new">
-              <span class="color-gary">还没有帐号？</span> <a href="">注册新帐号</a>
+              <span class="color-gary">还没有帐号？</span>
+              <router-link to="/portal/register">注册新帐号</router-link>
             </p>
           </div>
         </div>
@@ -66,7 +78,9 @@
     components: {},
     data() {
       return {
+        isRequest: false,
         user: {
+          type: 'LOGIN_PASSWORD',
           username: '',
           password: '',
           email: '',
@@ -78,22 +92,34 @@
       loginByWeChat() {
         Auth.logout();
       },
-      login() {
-        Api.login(this.user).then(res => {
-          if (res.status_code === Api.ResCodes.SUCCESS) {
-            Auth.setToken(res.data.access_token, res.data.expires_in - 60);
+      async login() {
+        try {
+          this.isRequest = true;
+          let res = await Api.login(this.user);
+          if (res.code === Api.ResCodes.SUCCESS) {
+            this.$store.commit('SET_LOGIN_STATUS', true);
+            Auth.setToken(res.access_token);
             //跳转
             let redirect = this.$route.query.redirect;
             redirect = redirect === undefined ? '/' : redirect;
             this.$router.replace({path: redirect});
           } else {
-            alert('登陆失败');
+            this.$notify({
+              type: 'error',
+              group: 'foo',
+              title: '登录失败',
+              text: res.message
+            });
           }
-        })
+        } catch (e) {
+
+        } finally {
+          this.isRequest = false;
+        }
       }
     },
     created() {
-      
+      Auth.logout();
     }
   }
 </script>
@@ -102,7 +128,7 @@
 <style scoped lang="scss">
   .app-logo {
     margin-top: 10%;
-    font-size: 45px;
+    font-size: 35px;
     margin-bottom: 40px;
   }
 

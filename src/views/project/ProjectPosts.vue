@@ -39,14 +39,9 @@
               </ul>
             </nav>
           </div>
-          <div class="wall-right">
-            <div class="post-view thin-scroll">
-              <div class="post-view-header">
-                <h3 v-html="post.title"></h3>
-              </div>
-              <div v-html="post.content"></div>
-            </div>
-          </div>
+          <transition name="fade">
+            <router-view></router-view>
+          </transition>
         </div>
       </div>
     </div>
@@ -128,12 +123,9 @@
       height: 100%;
       overflow-y: auto;
     }
-    .post-view {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      padding: 15px;
+    .wall-right {
+      display: flex;
+      flex-direction: column;
     }
     .posts-list {
       .post-item {
@@ -183,7 +175,6 @@
   }
 
 </style>
-
 <script>
   import Loading from '@/components/Loading';
   import CreatePostEditor from '@/components/CreatePostEditor'
@@ -201,25 +192,27 @@
     },
     watch: {
       'postId': function (n, o) {
-        console.log(n);
-        this.loadPost(n);
+        //this.loadPost(n);
+        this.$router.replace({
+          name: 'ProjectPostView',
+          params: {
+            postId: n
+          }
+        });
       }
     },
     methods: {
       closeCreator() {
         this.showCreator = false;
       },
-      submitCreator(post) {
-        console.log(post)
+      async submitCreator(post) {
         if (post._id) {
           //update
 
         } else {
-          post._project_id = this.project._id;
-          Api.createPost(post).then((res) => {
-            //在创建完成之后，关闭后重新LoadPosts
-            this.getPosts();
-          });
+          post._bindId = this.project._id;
+          let res = await Api.createPost({...post, type: 'posts.project'});
+          this.getPosts();
           this.showCreator = false;
         }
       },
@@ -228,33 +221,27 @@
         this.newPost = {title: '', content: ''};
         this.showCreator = true;
       },
-      loadPost(n) {
-        Api.post(n).then((post) => {
-          this.post = post;
-        });
-      },
       //获取全部分享
-      getPosts() {
-        Api.projectPosts(this.projectId, {}).then((posts) => {
-          this.posts = [];
-          this.posts = [...posts];
-          this.isLoading = false;
-          if (this.posts.length > 0) {
-            this.postId = this.posts[0]._id;
-          }
-        });
-      }
+      async getPosts() {
+        let posts = await Api.projectPosts(this.projectId, {});
+        this.posts = [...posts];
+        this.isLoading = false;
+        if (this.posts.length > 0) {
+          this.postId = this.posts[0]._id;
+        }
+      },
     },
     mounted() {
       this.getPosts();
     },
     data() {
       return {
+
         newPost: {},
         showCreator: false,
-        projectId: this.$route.params.project_id,
+        projectId: this.$route.params._projectId,
         postId: '',
-        post: {},
+
         posts: [],
         isLoading: true
       }

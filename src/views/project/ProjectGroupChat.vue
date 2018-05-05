@@ -5,40 +5,20 @@
         <header class="message-panel-header">
           <div class="header-content">
             <h4>
-              敏捷研发模板 - 群聊
+              {{project.title}} - 群聊
             </h4>
           </div>
         </header>
-        <section class="message-container flex-fill thin-scroll">
+        <section id="msgContainer" class="message-container flex-fill thin-scroll">
           <ul class="message-list list-unstyled">
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
-            <li class="message-item">1</li>
+            <msg-item :key="i" v-for="(m,i) in historyMessages" :msg="m"></msg-item>
           </ul>
-          <div class="place-bottom"></div>
         </section>
         <footer class="message-panel-footer flex-static">
-          <button>发送</button>
+          <el-input v-model="newMessage.content" type="textarea"></el-input>
+          <div class="text-right">
+            <el-button @click="send" type="primary" class="submit-btn">发送</el-button>
+          </div>
         </footer>
         <div class="message-panel-mask"></div>
       </div>
@@ -47,29 +27,94 @@
 </template>
 
 <script>
-  import Api from '@/utils/api'
-  import Auth from '@/utils/auth'
 
+  import MsgItem from '@/components/Chat/MsgItem'
+  import * as EventTypes from '../../utils/socket-event-types';
 
   export default {
     name: 'Project',
-    components: {},
+    components: {MsgItem},
     data() {
-      return {}
+      return {
+        //历史消息
+        historyMessages: [],
+        newMessage: {content: ''},
+        search: {
+          p: 1,
+        }
+      }
+    },
+    computed: {
+      project() {
+        return this.$store.state.project;
+      }
     },
     methods: {
-      loginByWeChat() {
-        //alert("跳转微信中");
-      },
-      login() {
 
+      //获取历史记录
+      async chatHistory() {
+        let query = this.$api.bQ({_projectId: this.project._id});
+        let res = await this.$api.instance().get('/chat/hgm?' + query);
+        this.historyMessages = res.concat(this.historyMessages);
+        this.scBottom();
+      },
+      async send() {
+        this.$socket.emit('chat.message', {
+          action: 'chat.room',
+          payload: {
+            message: this.newMessage.content,
+            to: this.project._id
+          }
+        });
+        this.newMessage.content = '';
+      },
+      async chooseGroup() {
+        this.$socket.emit('chat.room', {
+          action: 'change.room',
+          payload: {
+            projectId: this.project._id
+          }
+        });
+      },
+      scBottom() {
+        this.$nextTick(() => {
+          const ct = this.$el.querySelector('#msgContainer');
+          ct.scrollTop = ct.scrollHeight;
+        });
       }
+    },
+    async created() {
+      await this.chatHistory();
+      await this.chooseGroup();
+    },
+    socket: {
+      events: {
+        /**
+         * 收到信息
+         * @param chat
+         */
+        [EventTypes.CHAT_MESSAGE](msg) {
+          if (msg.data.action === 'chat.message') {
+            this.historyMessages.push({
+              ...msg.data.payload
+            });
+            this.scBottom();
+          }
+        },
+      }
+    },
+    activated() {
+      this.scBottom();
     }
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  .message-list {
+    padding: 10px;
+  }
+
   .project-message-view {
     position: fixed;
     top: 120px;
@@ -136,7 +181,10 @@
       overflow: visible;
       background-color: #e5e5e5;
       border-top: 1px solid #d9d9d9;
-      padding: 20px;
+      padding: 8px;
+    }
+    .submit-btn {
+      margin-top: 5px;
     }
   }
 

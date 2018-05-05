@@ -3,7 +3,7 @@
     <div class="modal-creator">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">创建分享至 <span>敏捷开发-毕业设计</span></h5>
+          <h5 class="modal-title" id="exampleModalLabel">创建分享至 <span>{{project.title}}</span></h5>
           <button @click="close" type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -40,6 +40,11 @@
     data() {
       return {
         editorType: 'Normal',//[normal,markdown]
+      }
+    },
+    computed: {
+      project() {
+        return this.$store.state.project;
       }
     },
     methods: {

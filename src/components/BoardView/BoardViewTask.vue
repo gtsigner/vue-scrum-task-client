@@ -16,6 +16,7 @@
            style="background-image:url('/static/images/head.jpg')"
            data-title="Godtoy"></div>
     </div>
+
   </div>
 </template>
 
@@ -25,6 +26,9 @@
 
   export default {
     name: "board-view-task",
+    data() {
+      return {};
+    },
     props: {
       task: {}
     },

@@ -13,30 +13,39 @@ export default {
   },
   async setTaskStages({commit, state}, stages) {
     //先存库,然后更新vuex
-    let stageIds = [];
-    stages.forEach((stage) => {
-      stageIds.push(stage._id)
+    stages.forEach((stage, sort) => {
+      stage.sort = sort;
     });
-    let taskListId = stages[0]._task_list_id;
-    Api.updateTaskList(taskListId, {stage_ids: stageIds}).then((res) => {
-
+    Api.updateTaskStages(stages).then(() => {
+      commit(types.SET_TASK_STAGES, stages);
     });
-    commit(types.SET_TASK_STAGES, stages);
   },
   //设置项目
   async getProjectAsync({commit}, projectId) {
-    return Api.project({'id': projectId})
-      .then((res) => {
-        if (res.project !== null) {
-          //将Project 提交到Vuex
-          commit(types.SET_PROJECT, res.project)
-        }
-      });
+    //获取Project
+    let res = await Api.project(projectId);
+    commit(types.SET_PROJECT, res.project);
+    commit(types.SET_TASK_STAGES, res.taskStages);
+    return res;
   },
   async addTaskStages({commit}, stage) {
     commit(types.ADD_TASK_STAGES, stage);
   },
   setProject({commit}, project) {
     commit(types.SET_PROJECT, project)
+  },
+  //加载用户基本信息
+  async loadLoginUser({commit}) {
+    let user = await Api.me();
+    if (user.code === 401) {
+      commit(types.SET_LOGIN_STATUS, false);
+    } else {
+      commit(types.SET_USER_PROFILE, user);
+      commit(types.SET_LOGIN_STATUS, true);
+      commit(types.SET_ACCESS_TOKEN, Api.accessToken);
+    }
+  },
+  async doInitLoad({commit}) {
+
   }
 }

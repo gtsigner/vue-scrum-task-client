@@ -8,4 +8,16 @@
       color: $color-primary;
     }
   }
+  .simditor-body {
+
+  }
+}
+
+.post-detail-warp {
+  .simditor .simditor-body {
+    padding: 0;
+    img {
+      max-width: 100%;
+    }
+  }
 }

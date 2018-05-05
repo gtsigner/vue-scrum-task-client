@@ -1,7 +1,21 @@
 <template>
   <div id="app">
-    <nav class="navbar menu-navbar navbar-expand-md navbar-light">
-      <router-link class="navbar-brand" to="/">OeyTeam</router-link>
+    <notifications
+      class="notice-box"
+      position="top left"
+      group="foo"/>
+    <nav v-if="isLogin" class="navbar menu-navbar navbar-expand-md navbar-light">
+      <!--下拉-->
+      <el-dropdown trigger="click">
+        <span class="el-dropdown-link"><i class="ion ion-android-menu nav-toggle-teams"></i></span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item>个人项目</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <router-link class="navbar-brand" to="/">
+        OeyTeam
+        <small>为敏捷开发而生</small>
+      </router-link>
       <ul class="navbar-nav mr-auto"></ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
@@ -42,23 +56,62 @@
     <div>
       <router-view></router-view>
     </div>
+    <div v-if="appLoading" class="full-loading">
+      <i class="el-icon-loading"></i>
+      <h4><span></span>Dashboard is loading ...</h4>
+    </div>
   </div>
 </template>
 
 <script>
   //导入全局样式表
 
+  import Loading from './components/Loading'
+  import {mapGetters} from 'vuex'
+
   export default {
     data() {
-      return {
-        isLogin: true,
+      return {}
+    },
+    computed: {
+      appLoading() {
+        return this.$store.state.appLoading;
+      },
+      isLogin() {
+        return this.$store.state.loginStatus;
       }
     },
-    components: {}
+    components: {
+      Loading
+    },
+    methods: {},
+    async mounted() {
+      //初始话信息
+      await this.$store.dispatch('loadLoginUser');
+      setTimeout(() => {
+        this.$store.commit('CHANGE_APP_LOADING', false);
+      }, 0);
+      //这里去给用户授权
+      this.$socket.emit('auth.login', {
+        action: '',
+        payload: {accessToken: this.$store.state.accessToken}
+      });
+    }
   }
 </script>
 
 <style lang="scss">
+  .nav-toggle-teams {
+    color: $color-gary;
+    margin: 0 10px;
+    font-size: 30px;
+    line-height: 30px;
+  }
+
+  .notice-box {
+    margin-top: 25px;
+    margin-left: 25px;
+  }
 
   .menu-navbar {
     position: relative;
@@ -111,5 +164,30 @@
 
   .ion-lg {
     font-size: 25px;
+  }
+
+  .full-loading {
+    position: fixed;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    z-index: 1001;
+    padding-top: 10%;
+    .load-view {
+      position: relative;
+      margin: 0 auto;
+    }
+  }
+
+  .el-icon-loading {
+    font-size: 50px;
+    margin: 10px;
+    color: $color-primary;
   }
 </style>

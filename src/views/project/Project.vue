@@ -1,12 +1,24 @@
 <template>
   <div>
     <div class="row project-nav-warp">
-      <div class="col-2"></div>
+      <div class="col-2">
+        <ul class="nav justify-content-end float-left">
+          <li class="nav-item">
+            <a href="" class="nav-btn">首页<span>&gt;</span></a>
+          </li>
+          <li class="nav-item">
+
+          </li>
+        </ul>
+      </div>
       <div class="col-8">
         <ul class="nav justify-content-center">
           <li class="nav-item" v-for="menu in menus" :key="menu._id">
-            <router-link active-class="active" class="nav-link" v-html="menu.title"
-                         :to="{name:menu.routeName,params:menu.params}" replace>
+            <router-link
+              active-class="active"
+              class="nav-link"
+              v-html="menu.title"
+              :to="{name:menu.routeName,params:menu.params}" replace>
             </router-link>
           </li>
           <li class="nav-item"
@@ -23,7 +35,13 @@
         </ul>
       </div>
       <div class="col-2">
-        <ul class="nav justify-content-end">
+        <ul class="nav justify-content-end float-right">
+          <li class="nav-item">
+            <a class="nav-btn" href="#">
+              <span class="ion ion-android-person"></span>
+              <span class="nav-btn-title">成员</span>
+            </a>
+          </li>
           <li class="nav-item">
             <a :class="{'active':showMenuPanel}" @click="showMenuPanel=!showMenuPanel" class="nav-btn" href="#">
               <span class="ion ion-android-menu"></span>
@@ -35,7 +53,11 @@
     </div>
     <div class="project-app-view">
       <loading v-if="isLoading"></loading>
-      <router-view></router-view>
+      <transition name="fade">
+        <keep-alive>
+          <router-view v-if="!isLoading"></router-view>
+        </keep-alive>
+      </transition>
     </div>
     <!--菜单组件-->
     <project-manage-panel
@@ -44,7 +66,7 @@
       @close="showMenuPanel=false">
     </project-manage-panel>
     <!--Modal组件-->
-    <component :is="modal" v-for="modal in modals" @close="closeModal"></component>
+    <component :is="modal" v-for="(modal,index) in modals" :key="index" @close="closeModal"></component>
   </div>
 </template>
 
@@ -71,18 +93,10 @@
         }
       }
     },
-    created() {
-      this.projectId = this.$route.params.project_id;
-
-      //同步Project
-      this.$store.dispatch('getProjectAsync', this.projectId);
-
-      this.initTaskList();
-      this.initTaskGroups();
-    },
     data() {
       return {
         isLoading: true,
+        taskList: {title: '任务'},
         taskGroups: [],
         projectId: null,
         menus: [],
@@ -90,12 +104,11 @@
           // {title: '需求', routeName: 'ProjectDemand'},
           // {title: '缺陷', routeName: 'ProjectDefect'},
           // {title: '迭代', routeName: 'ProjectIteration'},
+          {title: '源码', routeName: 'ProjectSource'},
           {title: '分享', routeName: 'ProjectPosts'},
           {title: '文件', routeName: 'ProjectCollection'},
-          {title: '日程', routeName: 'ProjectGroupChat'},
           {title: '统计', routeName: 'ProjectAnalytics'},
-          {title: '群聊', routeName: 'ProjectGroupChat'},
-          {title: '成员', routeName: 'ProjectMember'},
+          {title: '群聊', routeName: 'ProjectGroupChat'}
         ],
         showMenuPanel: false,
         modals: [],
@@ -115,40 +128,31 @@
       //初始化项目的applications
       initProjectApplications() {
 
-      },
-      //初始化Task列表
-      initTaskList() {
-        Api.taskList({
-          _project_id: this.projectId
-        }).then((res) => {
-          this.taskList = [];
-          res.forEach((item) => {
-            let menu = {
-              _id: item._id,
-              title: item.title,
-              routeName: 'ProjectNormal',
-              params: {
-                'project_id': item._project_id,
-                'task_list_id': item._id
-              }
-            };
-            this.menus.push(menu);
-            //this.menus.push();
-            this.taskList.push(item);
-            //在TaskList初始化完成后的阶段
-            this.isLoading = false;
-          });
+      }
+    },
+    async created() {
+      this.isLoading = true;
+      this.projectId = this.$route.params._projectId;
+      //同步Project
+      let res = await this.$store.dispatch('getProjectAsync', this.projectId);
+      this.taskGroups = [...res.taskGroups];
+      this.taskList = res.taskList;
+      if (res.taskList.isSmartyGroup === true) {
+        this.taskGroups.forEach((g) => {
+
         });
-      },
-      //获取Task阶段
-      initTaskGroups() {
-        Api.taskGroups({project_id: this.projectId}).then((res) => {
-          this.taskGroups = [];
-          res.forEach((group) => {
-            this.taskGroups.push(group);
-          })
+      } else {
+        this.menus.push({
+          _id: res.taskList._id,
+          title: res.taskList.title,
+          routeName: 'ProjectNormal',
+          params: {
+            '_projectId': res.taskList._projectId,
+            '_taskListId': res.taskList._id
+          }
         });
-      },
+      }
+      this.isLoading = false;
     }
   }
 </script>
@@ -194,4 +198,12 @@
     background: #f5f5f5;
   }
 
+  /*过度*/
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .3s;
+  }
+
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
 </style>

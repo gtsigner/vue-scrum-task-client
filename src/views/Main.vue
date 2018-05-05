@@ -13,11 +13,12 @@
       <p class="h3_title">企业项目</p>
       <b-card no-body class="project-card">
         <b-tabs pills card>
-          <b-tab v-for="tb in tabChooseCategories" :key="tb.type" :title="tb.title" :active="tb.active">
+          <b-tab v-for="tb in tabChooseCategories"
+                 :key="tb.type" :title="tb.title" :active="tb.active">
             <div class="tb-content row">
               <div class="col-4" v-for="project in projects" :key="project._id"
                    v-if="(project.type===tb.type||tb.type===0)">
-                <router-link :to="{name:'ProjectView',params:{project_id: project._id}}">
+                <router-link :to="{name:'ProjectView',params:{_projectId: project._id}}">
                   <div class="project-detail-box"
                        :style="{
                           backgroundImage: 'url(\''+project.logo+'\')'
@@ -43,6 +44,7 @@
         </b-tabs>
       </b-card>
     </div>
+
     <div class="trash-box">
       <p class="h3_title">项目回收站</p>
       <div class="text-center trash-none">
@@ -52,7 +54,9 @@
     </div>
     <!--创建项目Modal-->
     <div>
-      <b-modal v-model="showCreateProjectModal" id="createProjectModal" show title="规划新项目" ok-only>
+      <b-modal
+        v-model="showCreateProjectModal"
+        id="createProjectModal" show title="规划新项目" ok-only>
         <div>
           <div class="text-center mb-3 mt-1">
             <p>
@@ -76,7 +80,7 @@
             </div>
             <div class="form-group">
               <label for="viewType">项目模板</label>
-              <select class="form-control" id="viewType" v-model="newProject.is_smarty">
+              <select class="form-control" id="viewType" v-model="newProject.templateId">
                 <option value="0">基础模板</option>
                 <option value="1">专业模板</option>
               </select>
@@ -85,10 +89,18 @@
         </div>
         <!--footer-->
         <div slot="modal-footer" class="w-100">
-          <b-btn size="md" class="btn-block"
+          <b-btn size="md"
+                 v-if="!isCreating"
+                 class="btn-block"
                  variant="primary"
                  @click="createProject">
             完成并创建项目
+          </b-btn>
+          <b-btn size="md"
+                 v-if="isCreating"
+                 class="btn-block disabled"
+                 variant="primary">
+            项目创建中...
           </b-btn>
         </div>
       </b-modal>
@@ -101,17 +113,19 @@
   export default {
     data() {
       return {
+        isCreating: false,
         showCreateProjectModal: false,
         isLoading: true,
         tabChooseCategories: [
           {title: '全部', type: 0, active: true},
-          {title: '发起的项目', type: 2, active: false},
-          {title: '参与的项目', type: 1, active: false}
+          {title: '发起的项目', type: 1, active: false},
+          {title: '参与的项目', type: 2, active: false}
         ],
         newProject: {
           title: '',
+          viewType: '',
           description: '',
-          is_smarty: 1
+          templateId: 0
         },
         projects: [],
       }
@@ -120,39 +134,61 @@
     computed: {},
     components: {},
     methods: {
-      getMyProjects() {
-        Api.projects().then((res) => {
-          this.projects = [];
-          res.projects.forEach((project) => {
-            this.projects.push({
-              _id: project._id,
-              title: project.title,
-              description: project.description,
-              logo: project.logo,
-              is_smarty: 1,
-              type: 1,
-              status: project.status
-            })
-          });
+      //获取所有项目
+      async getMyProjects() {
+        let res = await Api.projects();
+        this.projects = [];
+        res.forEach((project) => {
+          this.projects.push({
+            _id: project._id,
+            title: project.title,
+            description: project.description,
+            logo: project.logo,
+            is_smarty: 1,
+            type: 1,
+            status: project.status
+          })
         });
       },
-      createProject() {
+      //创建项目
+      async createProject() {
         let project = {
           title: this.newProject.title,
           description: this.newProject.description,
-          type: this.newProject.view_type,
-          template_id: 0,
-          is_smarty: this.newProject.is_smarty,
+          type: this.newProject.viewType,
+          templateId: this.newProject.templateId,
           logo: "/static/images/project_bg_0.png",
         };
-        Api.createProject(project).then((res) => {
-          this.projects.push(res.project);
+        try {
+          this.isCreating = true;
+          let resProject = await  Api.createProject(project);
+          this.projects.push(resProject);
+        } catch (e) {
+
+        } finally {
+          this.isCreating = false;
           this.showCreateProjectModal = false;
-        });
+        }
       }
     },
-    created() {
+    async created() {
       this.getMyProjects();
+    },
+    socket: {
+      events: {
+        'HEART_CHECK'(packet) {
+          console.log(packet);
+        },
+        reconnect() {
+
+        },
+        disconnect() {
+
+        },
+        connected() {
+          console.log('connect');
+        },
+      }
     }
   }
 

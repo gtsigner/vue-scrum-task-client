@@ -18,7 +18,10 @@ let state = {
   user: {},
   taskLists: [],
   taskList: {},//
-  taskStages: []
+  taskStages: [],
+  appLoading: true,
+  loginStatus: false,
+  accessToken: ''
 };
 
 const store = new Vuex.Store({

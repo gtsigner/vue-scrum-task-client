@@ -15,13 +15,14 @@
     <div class="task-stage-wrap">
       <section class="stage-content thin-scroll">
         <div class="stage-tasks">
-          <draggable style="min-height: 100px;"
-                     :data-stage-id="stage._id"
-                     v-model="tasks"
-                     @choose="choose"
-                     @end="end"
-                     @sort="sort"
-                     :options="dragOptions">
+          <draggable
+            style="min-height: 100px;"
+            :data-stage-id="stage._id"
+            v-model="tasks"
+            @choose="choose"
+            @end="end"
+            @sort="sort"
+            :options="dragOptions">
             <board-view-task
               :data-task-id="task._id"
               :task="task"
@@ -95,57 +96,42 @@
         if (n === false && this.moveAble.fromStageId !== this.moveAble.toStageId) {
           console.log("Move:", `${this.moveAble.taskId} To ${this.moveAble.toStageId}`)
           Api.moveTask(this.moveAble.taskId, {_stage_id: this.moveAble.toStageId}).then((res) => {
+
           });
         }
       }
     },
     methods: {
       sort(ele) {
-        console.log("Sort:", ele);
       },
       choose(ele) {
         this.moveAble.taskId = ele.item.getAttribute('data-task-id');
         this.moveAble.fromStageId = ele.from.getAttribute('data-stage-id');
-        console.log("Choose:", this.moveAble);
         this.moveAble.update = true;
-        console.log(ele);
       },
       end(ele) {
         this.moveAble.toStageId = ele.to.getAttribute('data-stage-id');
-        console.log("End:", this.moveAble);
         this.moveAble.update = false;
-        console.log(ele);
       },
-      createTask() {
+      async createTask() {
         let nt = {
-          _project_id: '',
-          _task_list_id: '',
-          _stage_id: '',
+          _projectId: this.project._id,
+          _taskListId: '',
+          _stageId: this.stage._id,
           title: this.newTask.title,
           content: '',
           status: 1
         };
-        nt._project_id = this.project._id;
-        nt._stage_id = this.stage._id;
-        //nt._task_list_id = this.taskList._id;
-        Api.createTask(nt).then((res) => {
-          this.tasks.push(res);
-        });
+        let res = await  Api.createTask(nt);
+        this.tasks.push(res);
         this.showCreator = false;
       },
       //初始化阶段的Task
-      initStageTask() {
+      async initStageTask() {
         this.isLoading = true;
-        Api.tasks({
-          project_id: this.project._id,
-          stage_id: this.stage._id
-        }).then((res) => {
-          this.tasks = [];
-          res.forEach((task) => {
-            this.tasks.push(task);
-          });
-          this.isLoading = false;
-        });
+        let res = await Api.tasks({_projectId: this.project._id, _stageId: this.stage._id});
+        this.tasks = [...res];
+        this.isLoading = false;
       }
     },
     created() {

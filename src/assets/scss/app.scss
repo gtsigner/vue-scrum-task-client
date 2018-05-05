@@ -326,3 +326,10 @@ a:hover, a:focus, a:active {
     display: none;
   }
 }
+
+.el-dropdown-link {
+  cursor: pointer;
+  &:hover {
+
+  }
+}

@@ -13,11 +13,19 @@ import ProjectCollection from '@/views/project/ProjectCollection'
 import ProjectMember from '@/views/project/ProjectMember'
 import ProjectAnalytics from '@/views/project/ProjectAnalytics'
 
+
+import ProjectPostView from '@/views/project/apps/ProjectPostView'
+
 const ProjectAppsView = [
   {
     name: 'ProjectPosts',
     path: 'posts',
-    component: ProjectPosts//分享
+    component: ProjectPosts,//分享
+    children: [{
+      name: 'ProjectPostView',
+      path: 'post/:postId',
+      component: ProjectPostView,//分享
+    }]
   },
   {
     name: 'ProjectCollection',
@@ -38,7 +46,7 @@ const ProjectAppsView = [
 
 export default [
   {
-    path: '/project/:project_id',
+    path: '/project/:_projectId',
     component: Project,
     meta: {
       requiresAuth: true
@@ -49,10 +57,15 @@ export default [
         path: '',
         component: ProjectView//项目总览
       },
+      {
+        name: 'ProjectSource',
+        path: 'source',
+        component: ProjectView//项目总览
+      },
       /*项目类型*/
       {
         name: 'ProjectNormal',
-        path: 'task/normal/:task_list_id',
+        path: 'task/normal/:_taskListId',
         component: ProjectNormal//普通项目模板
       },
       /**/

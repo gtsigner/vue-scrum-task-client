@@ -1,9 +1,10 @@
 import axios from 'axios'
 import auth from './auth'
-import router from '@/router/index'
+import router from '@/router'
+import QueryString from 'querystring';
 
 const configs = {
-  baseURL: 'http://team.oeyteam.com/api/',
+  baseURL: 'http://team.oeynet.com/api/v1',
   version: 'v1',
 }
 
@@ -31,9 +32,10 @@ const instance = axios.create({
 //加入Token在Request拦截器中
 instance.interceptors.request.use((config) => {
   config.headers['Authorization'] = 'Bearer ' + auth.getToken();
+  config.headers['Access-Token'] = auth.getToken();
   return config;
 }, (error) => {
-  return Promise.reject(error);
+  throw new Error(error);
 });
 // http response 拦截器
 instance.interceptors.response.use((response) => {
@@ -42,22 +44,17 @@ instance.interceptors.response.use((response) => {
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          // 返回 401 清除token信息并跳转到登录页面
-          console.warn('Token失效');
           auth.logout();
-          router.replace({name: 'Login'});
-          break;
+          return window.location.href = '/#/portal/login';
         case 500:
           console.log("服务器异常");
           break;
       }
     }
-    console.log(error.message);
-    //
     if (error.message.indexOf('Network Error') !== -1) {
-      alert('服务链接失败');
+      return error.response.data;
     }
-    return Promise.reject(error.response.data)   // 返回接口返回的错误信息
+    return error.response.data;
   }
 );
 
@@ -73,14 +70,15 @@ const API_URLS = {
     move: 'tasks/move'
   },
   taskGroups: {
-    index: 'task_groups',
+    index: 'taskGroups',
   },
   taskList: {
-    index: 'task_lists',
-    stages: 'task_stages',
+    index: 'taskList',
+    stages: 'taskStage',
   },
   user: {
     profile: 'user/profile',
+    me: 'user/me'
   },
   //分享
   posts: {
@@ -99,11 +97,14 @@ export default {
   login(user) {
     return instance.post(API_URLS.portal.login, user)
   },
+  me() {
+    return instance.get(API_URLS.user.me);
+  },
   projects() {
     return instance.get(API_URLS.projects.index);
   },
-  project(where) {
-    return instance.get(API_URLS.projects.index + '?' + buildQueryString(where));
+  project(id) {
+    return instance.get(`${API_URLS.projects.index}/${id}/show`);
   },
   //项目下的Posts
   projectPosts(projectId, params) {
@@ -165,8 +166,9 @@ export default {
   createTaskStage(stage) {
     return instance.post(API_URLS.taskList.stages, stage);
   },
-  updateTaskStages() {
-
+  //批量更新Stages
+  updateTaskStages(stages) {
+    return instance.post('taskStage/sort', stages);
   },
   /*#endregion*/
   profile() {
@@ -185,5 +187,16 @@ export default {
   },
   createPost(post) {
     return instance.post(API_URLS.posts.index, post);
-  }
+  },
+  postComments(postId) {
+    return instance.get(API_URLS.posts.index + '/' + postId + '/comments');
+  },
+  createPostComment(postId, comment) {
+    return instance.post(API_URLS.posts.index + '/' + postId + '/comment', comment)
+  },
+  instance() {
+    return instance;
+  },
+  bQ: buildQueryString,
+  accessToken: auth.getToken()
 }

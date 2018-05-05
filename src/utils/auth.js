@@ -1,5 +1,3 @@
-import token from '../store/token'
-
 const AppAccessTokenName = 'app_access_token';
 export default {
   /**

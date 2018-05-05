@@ -80,33 +80,20 @@
     },
     methods: {
       //为任务列表创建一个新的阶段
-      createStage() {
+      async createStage() {
         let stage = {
-          '_project_id': this.project._id,
-          '_task_list_id': this.taskList._id,
+          '_projectId': this.project._id,
+          '_taskListId': this.taskList._id,
           'name': this.newStage.name,
+          'title': this.newStage.name,
           'sort': this.taskStages.length
         };
-        Api.createTaskStage(stage).then((res) => {
-          this.$store.dispatch('addTaskStages', res);
-        });
+        let res = await Api.createTaskStage(stage);
+        this.$store.dispatch('addTaskStages', res);
       }
     },
-    mounted() {
-      this.$nextTick(() => {
-        this.taskList._id = this.$route.params.task_list_id;
-        //同步TaskStages完成后，分别给TaskStages添加task
-        //需要先获取到TaskList
-        Api.taskList({
-          '_project_id': this.$route.params.project_id,
-        }).then((res) => {
-          this.taskList = res[0];
-        });
-        this.$store.dispatch('getTaskStagesAsync', {
-          project_id: this.$route.params.project_id,
-          task_list_id: this.taskList._id
-        });
-      });
+    async created() {
+      this.taskList._id = this.$route.params._taskListId;
     }
   }
 

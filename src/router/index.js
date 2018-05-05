@@ -28,7 +28,6 @@ const router = new Router({
 });
 
 /*路由拦截*/
-
 router.beforeEach((to, from, next) => {
   /*查看是否需要权限*/
   if (to.matched.some(record => record.meta.requiresAuth)) {
