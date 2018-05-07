@@ -11,10 +11,12 @@ import getters from './getters'
 
 let state = {
   project: {
+    _id: '',
     title: 'loading'
   },//当前项目
   tags: [],
   projects: [],
+  posts: [],
   user: {},
   taskLists: [],
   taskList: {},//

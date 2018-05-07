@@ -7,20 +7,25 @@ import ProjectView from '@/views/project/ProjectView'
 import ProjectNormal from '@/views/project/ProjectNormal'
 import ProjectGroupChat from '@/views/project/ProjectGroupChat'
 
-
+//分享
 import ProjectPosts from '@/views/project/ProjectPosts'
+//文件夹
 import ProjectCollection from '@/views/project/ProjectCollection'
+//成员
 import ProjectMember from '@/views/project/ProjectMember'
+//可视化
 import ProjectAnalytics from '@/views/project/ProjectAnalytics'
-
-
+//分享子页面
 import ProjectPostView from '@/views/project/apps/ProjectPostView'
+//源码
+import ProjectSourceView from '@/views/project/ProjectSource'
 
 const ProjectAppsView = [
   {
     name: 'ProjectPosts',
     path: 'posts',
     component: ProjectPosts,//分享
+    //子分享
     children: [{
       name: 'ProjectPostView',
       path: 'post/:postId',
@@ -29,7 +34,7 @@ const ProjectAppsView = [
   },
   {
     name: 'ProjectCollection',
-    path: 'collections',
+    path: 'collections/:collectionId?',
     component: ProjectCollection//文件
   },
   {
@@ -60,7 +65,7 @@ export default [
       {
         name: 'ProjectSource',
         path: 'source',
-        component: ProjectView//项目总览
+        component: ProjectSourceView//项目总览
       },
       /*项目类型*/
       {

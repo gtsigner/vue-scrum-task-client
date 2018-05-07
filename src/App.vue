@@ -16,6 +16,9 @@
         OeyTeam
         <small>为敏捷开发而生</small>
       </router-link>
+      <div class="logo">
+        <img src="/static/logo.png" alt="">
+      </div>
       <ul class="navbar-nav mr-auto"></ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
@@ -48,7 +51,7 @@
         </li>
         <li class="nav-item">
           <a href="#">
-            <img src="/static/images/head.jpg" class="user-head-img" alt="">
+            <img :src="user.avatar" class="user-head-img" alt="">
           </a>
         </li>
       </ul>
@@ -79,6 +82,12 @@
       },
       isLogin() {
         return this.$store.state.loginStatus;
+      },
+      project() {
+
+      },
+      user() {
+        return this.$store.state.user;
       }
     },
     components: {
@@ -101,6 +110,18 @@
 </script>
 
 <style lang="scss">
+  .logo {
+    align-self: center !important;
+    position: absolute;
+    left: 40%;
+    right: 40%;
+    width: 20%;
+    text-align: center;
+    img {
+      height: 30px;
+    }
+  }
+
   .nav-toggle-teams {
     color: $color-gary;
     margin: 0 10px;

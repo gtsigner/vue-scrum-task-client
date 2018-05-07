@@ -1,3 +1,4 @@
+@import "~vue2-animate/src/sass/vue2-animate";
 
 body {
   font-family: Helvetica Neue, PingFang SC, Microsoft Yahei, \\5FAE\8F6F\96C5\9ED1, STXihei, \\534E\6587\7EC6\9ED1, sans-serif;
@@ -332,4 +333,17 @@ a:hover, a:focus, a:active {
   &:hover {
 
   }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/*过度*/
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }

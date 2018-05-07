@@ -18,7 +18,7 @@
             <nav class="thin-scroll posts-nav">
               <ul class="posts-list list-unstyled">
                 <loading class="mt-2" v-if="isLoading"></loading>
-                <li @click="postId=pt._id"
+                <li @click="jump(pt._id)"
                     :class="{'active':pt._id===postId}"
                     class="post-item" v-for="pt in posts">
                   <section>
@@ -39,9 +39,9 @@
               </ul>
             </nav>
           </div>
-          <transition name="fade">
+          <keep-alive>
             <router-view></router-view>
-          </transition>
+          </keep-alive>
         </div>
       </div>
     </div>
@@ -188,17 +188,9 @@
     computed: {
       project() {
         return this.$store.state.project
-      }
-    },
-    watch: {
-      'postId': function (n, o) {
-        //this.loadPost(n);
-        this.$router.replace({
-          name: 'ProjectPostView',
-          params: {
-            postId: n
-          }
-        });
+      },
+      posts() {
+        return this.$store.state.posts;
       }
     },
     methods: {
@@ -212,7 +204,6 @@
         } else {
           post._bindId = this.project._id;
           let res = await Api.createPost({...post, type: 'posts.project'});
-          this.getPosts();
           this.showCreator = false;
         }
       },
@@ -221,28 +212,32 @@
         this.newPost = {title: '', content: ''};
         this.showCreator = true;
       },
-      //获取全部分享
-      async getPosts() {
-        let posts = await Api.projectPosts(this.projectId, {});
-        this.posts = [...posts];
-        this.isLoading = false;
+      jump(id) {
+        this.postId = id;
+        this.$router.replace({name: 'ProjectPostView', params: {postId: this.postId}});
+      },
+      chooseDefault() {
         if (this.posts.length > 0) {
           this.postId = this.posts[0]._id;
+          this.$router.replace({name: 'ProjectPostView', params: {postId: this.postId}});
         }
-      },
+      }
     },
-    mounted() {
-      this.getPosts();
+    async activated() {
+      this.chooseDefault();
+    },
+    async mounted() {
+      //获取分享资料列表
+      await this.$store.dispatch('loadProjectPost', this.project._id);
+      this.isLoading = false;
+      this.chooseDefault();
     },
     data() {
       return {
-
         newPost: {},
+        postId: '',
         showCreator: false,
         projectId: this.$route.params._projectId,
-        postId: '',
-
-        posts: [],
         isLoading: true
       }
     }

@@ -26,5 +26,8 @@ export default {
   },
   [types.SET_ACCESS_TOKEN](state, at) {
     state.accessToken = at;
+  },
+  [types.SET_PROJECT_POSTS](state, posts) {
+    state.posts = posts;
   }
 }

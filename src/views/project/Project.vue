@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="finishLoading">
     <div class="row project-nav-warp">
       <div class="col-2">
         <ul class="nav justify-content-end float-left">
@@ -36,10 +36,10 @@
       </div>
       <div class="col-2">
         <ul class="nav justify-content-end float-right">
-          <li class="nav-item">
-            <a class="nav-btn" href="#">
+          <li class="nav-item" v-if="project.members">
+            <a :class="{'active':showMemberPanel}" @click="showMemberPanel=!showMemberPanel" class="nav-btn" href="#">
               <span class="ion ion-android-person"></span>
-              <span class="nav-btn-title">成员</span>
+              <span class="nav-btn-title">成员 {{project.members.length}}</span>
             </a>
           </li>
           <li class="nav-item">
@@ -65,8 +65,33 @@
       v-if="showMenuPanel"
       @close="showMenuPanel=false">
     </project-manage-panel>
+    <Panel
+      @open-dialog="showMemberDialog = true"
+      @update:show="showMemberPanel=$event" :show="showMemberPanel"></Panel>
     <!--Modal组件-->
     <component :is="modal" v-for="(modal,index) in modals" :key="index" @close="closeModal"></component>
+
+    <el-dialog class="new-member-dialog" title="邀请新成员" :visible.sync="showMemberDialog">
+      <div class="search-form">
+        <div class="form-group">
+          <el-input v-model="memberSearch.keywords" type="text" placeholder="请输入用户名或者邮箱查找"></el-input>
+        </div>
+        <div class="form-results">
+          <loading v-if="memberSearch.isLoading"></loading>
+          <div class="member-item"
+               v-for="(m,i) in memberSearch.members" :key="i">
+            <img class="avatar" :src="m.avatar" alt="">
+            <div class="content">
+              <p class="nickname">{{m.username}}</p>
+              <p class="email">{{m.email}}</p>
+            </div>
+            <div class="right-menu">
+              <el-button type="primary" @click="addMember(m)">邀请</el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -76,25 +101,27 @@
 
   import Loading from '@/components/Loading'
   import ProjectManagePanel from '@/components/ProjectManagePanel'
+  import Panel from '@/components/Panels/Panel'
   import ProjectSettingModal from '@/components/Modals/ProjectSettingModal'
 
   export default {
     name: 'Project',
     components: {
-      Loading, ProjectManagePanel, ProjectSettingModal
+      Loading, ProjectManagePanel, ProjectSettingModal, Panel
     },
     computed: {
-      project: {
-        get() {
-          return this.$store.state.project;
-        },
-        set(project) {
-          this.$store.dispatch('setProject', project);
-        }
+      project() {
+        return this.$store.state.project;
+      }
+    },
+    watch: {
+      ['memberSearch.keywords'](n) {
+        this.searchMember(n);
       }
     },
     data() {
       return {
+        finishLoading: false,
         isLoading: true,
         taskList: {title: '任务'},
         taskGroups: [],
@@ -106,12 +133,21 @@
           // {title: '迭代', routeName: 'ProjectIteration'},
           {title: '源码', routeName: 'ProjectSource'},
           {title: '分享', routeName: 'ProjectPosts'},
-          {title: '文件', routeName: 'ProjectCollection'},
+          {
+            title: '文件', routeName: 'ProjectCollection'
+          },
           {title: '统计', routeName: 'ProjectAnalytics'},
           {title: '群聊', routeName: 'ProjectGroupChat'}
         ],
         showMenuPanel: false,
+        showMemberPanel: false,
+        showMemberDialog: false,
         modals: [],
+        memberSearch: {
+          keywords: '',
+          members: [],
+          isLoading: false
+        }
       }
     },
     methods: {
@@ -128,7 +164,34 @@
       //初始化项目的applications
       initProjectApplications() {
 
+      },
+      async searchMember(keywords) {
+        this.memberSearch.isLoading = true;
+        let res = await this.$api.instance().get(`user/search?keywords=${keywords}`);
+        this.memberSearch.members = [...res];
+        this.memberSearch.isLoading = false;
+      },
+      async addMember(user) {
+        let res = this.$api.instance().post(`project/${this.project._id}/addUser`, {
+          projectId: this.project._id,
+          userId: user._id
+        });
+        this.$message({
+          message: '恭喜你，邀请成功',
+          type: 'success'
+        });
+      },
+      async chooseRoom() {
+        this.$socket.emit('chat.room', {
+          action: 'change.room',
+          payload: {
+            projectId: this.project._id
+          }
+        });
       }
+    },
+    async mounted() {
+      this.chooseRoom();
     },
     async created() {
       this.isLoading = true;
@@ -153,12 +216,55 @@
         });
       }
       this.isLoading = false;
+      this.finishLoading = true;
     }
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  .new-member-dialog {
+    .form-results {
+      min-height: 300px;
+    }
+    .member-item {
+      display: flex;
+      padding: 5px 10px;
+      cursor: pointer;
+      &:hover {
+        background: $grey-200;
+      }
+      .avatar {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+      }
+      .content {
+        margin-left: 10px;
+        flex: auto;
+        p {
+          line-height: 25px;
+          display: block;
+          margin-bottom: 0;
+        }
+        .email {
+          font-size: 13px;
+        }
+      }
+      &:hover .right-menu {
+        display: block;
+      }
+      .right-menu {
+        align-self: center;
+        margin-right: 10px;
+        line-height: 30px;
+        display: none;
+        i {
+          font-size: 20px;
+        }
+      }
+    }
+  }
 
   .project-nav-warp {
     padding: 0;

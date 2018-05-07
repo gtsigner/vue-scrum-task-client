@@ -6,10 +6,19 @@
           <div class="header-content">
             <h4>
               {{project.title}} - 群聊
+              <el-popover
+                placement="bottom"
+                width="200"
+                trigger="click"
+                content="清空消息">
+                <span slot="reference" class="float-right toggle-more">
+                  <i class="ion ion-ios-more"></i>
+                </span>
+              </el-popover>
             </h4>
           </div>
         </header>
-        <section id="msgContainer" class="message-container flex-fill thin-scroll">
+        <section style="height: 0" id="msgContainer" class="message-container flex-fill thin-scroll">
           <ul class="message-list list-unstyled">
             <msg-item :key="i" v-for="(m,i) in historyMessages" :msg="m"></msg-item>
           </ul>
@@ -62,6 +71,7 @@
         this.$socket.emit('chat.message', {
           action: 'chat.room',
           payload: {
+            _projectId: this.project._id,
             message: this.newMessage.content,
             to: this.project._id
           }
@@ -107,12 +117,21 @@
       this.scBottom();
     }
   }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
   .message-list {
     padding: 10px;
+  }
+
+  .toggle-more {
+    cursor: pointer;
+    line-height: 65px;
+    .ion {
+      font-size: 30px;
+    }
   }
 
   .project-message-view {

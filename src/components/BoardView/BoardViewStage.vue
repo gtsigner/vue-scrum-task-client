@@ -4,9 +4,13 @@
     <!--header-->
     <header class="task-stage-header ui-sortable-handle">
       <div class="task-name hinted">
-        <span v-html="stage.name"></span> ·
-        <span class="task-count" v-html="tasks.length"></span>
-        <i class="ion ion-android-arrow-dropdown-circle board-stage-menu float-right"></i>
+        <div class="head">
+          <span v-html="stage.name"></span> ·
+          <span class="task-count" v-html="tasks.length"></span>
+        </div>
+        <div>
+          <i class="ion ion-android-arrow-dropdown-circle board-stage-menu"></i>
+        </div>
       </div>
     </header>
     <div class="task-loading">
@@ -60,6 +64,7 @@
   import Draggable from 'vuedraggable'
   import BoardViewTask from './BoardViewTask'
   import Loading from '../Loading'
+  import * as EventTypes from '../../utils/socket-event-types'
 
   export default {
     name: "board-view-stage",
@@ -95,7 +100,8 @@
         //判断是否需要移动
         if (n === false && this.moveAble.fromStageId !== this.moveAble.toStageId) {
           console.log("Move:", `${this.moveAble.taskId} To ${this.moveAble.toStageId}`)
-          Api.moveTask(this.moveAble.taskId, {_stage_id: this.moveAble.toStageId}).then((res) => {
+          Api.moveTask(this.moveAble.taskId,
+            {_stageId: this.moveAble.toStageId}).then((res) => {
 
           });
         }
@@ -120,7 +126,7 @@
           _stageId: this.stage._id,
           title: this.newTask.title,
           content: '',
-          status: 1
+          status: 0
         };
         let res = await  Api.createTask(nt);
         this.tasks.push(res);
@@ -134,6 +140,15 @@
         this.isLoading = false;
       }
     },
+    socket: {
+      //事件
+      events: {
+        //当新的任务事件通知
+        [EventTypes.PROJECT_NEW_TASK](packet) {
+
+        }
+      }
+    },
     created() {
       this.initStageTask();
     }
@@ -142,7 +157,12 @@
 
 <style lang="scss">
   .task-stage {
-
+    .task-name {
+      display: flex;
+      .head {
+        flex: auto;
+      }
+    }
   }
 
   .task {

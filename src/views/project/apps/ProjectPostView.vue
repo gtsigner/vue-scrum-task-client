@@ -48,7 +48,7 @@
             </div>
             <div>
               <span class="username" v-html="comment.creator.username"></span>
-              <p  v-html="comment.content"></p>
+              <p v-html="comment.content"></p>
             </div>
           </li>
         </ul>
@@ -122,7 +122,9 @@
     },
     watch: {
       ['$route.params.postId'](n) {
-        this.loadPost(n);
+        if (n) {
+          this.loadPost(n);
+        }
       }
     },
     async mounted() {

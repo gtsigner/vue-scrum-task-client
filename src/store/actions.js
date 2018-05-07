@@ -47,5 +47,9 @@ export default {
   },
   async doInitLoad({commit}) {
 
+  },
+  async loadProjectPost({commit}, projectId) {
+    let res = await Api.instance().get(`project/${projectId}/posts`);
+    commit('SET_PROJECT_POSTS', res);
   }
 }
