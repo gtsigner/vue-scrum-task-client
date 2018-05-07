@@ -34,6 +34,11 @@ https://github.com/zhaojunlike/laravel-scrum-dev-paas
 
 ![](screenshots/6.png)
 
+![](screenshots/10.png)
+![](screenshots/11.png)
+![](screenshots/13.png)
+![](screenshots/oeyteam.jpg)
+
 
 
 
