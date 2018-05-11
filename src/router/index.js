@@ -22,9 +22,10 @@ const rooter = [
 
 import portal from './portal';
 import project from './project';
+import user from './user';
 
 const router = new Router({
-  routes: rooter.concat(portal).concat(project)
+  routes: rooter.concat(portal).concat(project).concat(user)
 });
 
 /*路由拦截*/
@@ -47,7 +48,7 @@ router.beforeEach((to, from, next) => {
   } else {
     next() // 确保一定要调用 next()
   }
-})
+});
 
 router.beforeEach(function (to, from, next) {
   //store.commit('updateLoadingStatus', {isLoading: true})

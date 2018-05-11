@@ -4,7 +4,7 @@ import router from '@/router'
 import QueryString from 'querystring';
 
 const configs = {
-  baseURL: 'http://team.oeynet.com/api/v1',
+  baseURL: 'http://www.oeyteam.com/api/v1',
   version: 'v1',
 }
 
@@ -44,8 +44,13 @@ instance.interceptors.response.use((response) => {
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          auth.logout();
-          return window.location.href = '/#/portal/login';
+          //判断当前路由是否已经是登录api
+          if (/user\/me/.test(error.request.responseURL)) {
+            console.log("跳过跳转");
+          } else {
+            auth.logout();
+            return window.location.href = '/#/portal/login';
+          }
         case 500:
           console.log("服务器异常");
           break;

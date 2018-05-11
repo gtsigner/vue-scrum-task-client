@@ -1,56 +1,7 @@
 <template>
-  <div class="collection-view container">
-    <div class="wall-view">
-      <div class="collection-header">
-        <h4>文件库</h4>
-        <div>
-          <span class="ion ion-plus-circled"></span>
-          <span class="create-btn">创建文件夹</span>
-        </div>
-        <div>
-          <span class="ion ion-ios-upload"></span>
-          <span class="upload-btn">上传</span>
-        </div>
-      </div>
-      <div class="collection-content thin-scroll flex-fill">
-        <table class="table table-hover">
-          <thead>
-          <tr class="header-tr">
-            <td style="width: 30px;">
-              <el-checkbox size="medium" name="type"></el-checkbox>
-            </td>
-            <td>名称</td>
-            <td>大小</td>
-            <td>创建者</td>
-            <td>更新时间</td>
-            <td></td>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="(col,i) in collections" :key="i">
-            <td>
-              <el-checkbox size="medium" name="type"></el-checkbox>
-            </td>
-            <td>
-              <img class="icon-floder" src="/static/images/floder.png" alt="">
-              {{col.title}}
-            </td>
-            <td>{{col.size||'-'}}</td>
-            <td>{{col.creator.username}}</td>
-            <td>{{col.updateAt||'-'}}</td>
-            <td>
-              <!--操作-->
-            </td>
-          </tr>
-          <tr class="text-center" v-if="collections.length===0">
-            <td colspan="20">空空如也~</td>
-          </tr>
-          </tbody>
-        </table>
-        <loading v-if="isLoading"></loading>
-      </div>
-    </div>
-  </div>
+  <keep-alive>
+    <router-view></router-view>
+  </keep-alive>
 </template>
 
 <script>
@@ -58,51 +9,24 @@
 
   export default {
     name: "project-collection",
-    components: {
-      Loading
-    },
     computed: {
-      project() {
-        return this.$store.state.project;
+      folder() {
+        return this.$store.state.folder;
       }
     },
     data() {
-      return {
-        isLoading: true,
-        collections: [],
-        current: {},//需要默认一个Current
-        files: [],
-      }
+      return {}
     },
-    watch: {
-      ['current._id'](n) {
-
-      }
-    },
-    methods: {
-      async getDefaultCollections() {
-        this.isLoading = true;
-        let res = await this.$api.instance().get(`project/${this.project._id}/collections`);
-        //默认一个新文件夹
-        res.forEach((coll) => {
-          if (coll.type === 'default') {
-            this.current = {...coll}
+    components: {},
+    activated() {
+      if (this.$route.name === 'ProjectCollection') {
+        this.$router.replace({
+          name: 'project-collection-view',
+          params: {
+            _collectionId: this.folder._id,
           }
-        });
-        //获取当前默认文件夹的子文件夹
-        res.forEach((coll) => {
-          if (coll._parentId === this.current._id) {
-            this.collections.push(coll)
-          }
-        });
-        this.isLoading = false;
+        })
       }
-    },
-    created() {
-      this.getDefaultCollections();
-    },
-    mounted() {
-
     }
   }
 </script>
@@ -135,9 +59,10 @@
       display: flex;
       align-items: center;
       line-height: 40px;
-      h4 {
+      flex: none;
+      .nav-bread {
+        font-size: 20px;
         flex: auto;
-        margin: 0;
       }
       .ion {
         font-size: 18px;
@@ -155,7 +80,7 @@
     }
     .collection-content {
       overflow-y: auto;
-
+      flex: auto;
       .table {
         .header-tr {
           font-size: 18px;

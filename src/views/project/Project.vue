@@ -2,14 +2,12 @@
   <div v-if="finishLoading">
     <div class="row project-nav-warp">
       <div class="col-2">
-        <ul class="nav justify-content-end float-left">
-          <li class="nav-item">
-            <a href="" class="nav-btn">首页<span>&gt;</span></a>
-          </li>
-          <li class="nav-item">
-
-          </li>
-        </ul>
+        <div class="justify-content-end nav-bread">
+          <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{path:'/'}">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>{{project.title}}</el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
       </div>
       <div class="col-8">
         <ul class="nav justify-content-center">
@@ -18,7 +16,7 @@
               active-class="active"
               class="nav-link"
               v-html="menu.title"
-              :to="{name:menu.routeName,params:menu.params}" replace>
+              :to="{name:menu.routeName,params:menu.params}">
             </router-link>
           </li>
           <li class="nav-item"
@@ -28,8 +26,7 @@
               active-class="active"
               class="nav-item nav-link"
               v-html="appItem.title"
-              :to="{name:appItem.routeName}"
-              replace>
+              :to="{name:appItem.routeName,params:appItem.params}">
             </router-link>
           </li>
         </ul>
@@ -112,6 +109,9 @@
     computed: {
       project() {
         return this.$store.state.project;
+      },
+      folder() {
+        return this.$store.state.folder;
       }
     },
     watch: {
@@ -121,6 +121,7 @@
     },
     data() {
       return {
+        navs: [],
         finishLoading: false,
         isLoading: true,
         taskList: {title: '任务'},
@@ -131,13 +132,10 @@
           // {title: '需求', routeName: 'ProjectDemand'},
           // {title: '缺陷', routeName: 'ProjectDefect'},
           // {title: '迭代', routeName: 'ProjectIteration'},
-          {title: '源码', routeName: 'ProjectSource'},
+          {title: '代码库', routeName: 'project-source-root'},
+          {title: '可视化', routeName: 'ProjectAnalytics'},
+          {title: '群聊', routeName: 'ProjectGroupChat'},
           {title: '分享', routeName: 'ProjectPosts'},
-          {
-            title: '文件', routeName: 'ProjectCollection'
-          },
-          {title: '统计', routeName: 'ProjectAnalytics'},
-          {title: '群聊', routeName: 'ProjectGroupChat'}
         ],
         showMenuPanel: false,
         showMemberPanel: false,
@@ -188,7 +186,23 @@
             projectId: this.project._id
           }
         });
+      },
+      //加载bind applications
+      async loadApplications() {
+        //文件
+        this.applications.push({
+          title: '文件', routeName: 'ProjectCollection'
+        });
+        //分享
+
+        //群聊
+
+        //
       }
+    },
+    activated() {
+      //是否是根目录
+
     },
     async mounted() {
       this.chooseRoom();
@@ -202,7 +216,16 @@
       this.taskList = res.taskList;
       if (res.taskList.isSmartyGroup === true) {
         this.taskGroups.forEach((g) => {
-
+          this.menus.push({
+            _id: g._id,
+            title: g.title,
+            routeName: 'ProjectSmarty',
+            params: {
+              '_projectId': res.taskList._projectId,
+              '_taskListId': res.taskList._id,
+              '_taskGroupId': g._id,
+            }
+          });
         });
       } else {
         this.menus.push({
@@ -215,6 +238,8 @@
           }
         });
       }
+      this.loadApplications();
+
       this.isLoading = false;
       this.finishLoading = true;
     }
@@ -223,6 +248,14 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
+  .nav-bread {
+    .el-breadcrumb {
+      line-height: 52px;
+      font-size: 16px;
+    }
+  }
+
   .new-member-dialog {
     .form-results {
       min-height: 300px;

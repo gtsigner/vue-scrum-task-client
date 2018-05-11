@@ -29,5 +29,11 @@ export default {
   },
   [types.SET_PROJECT_POSTS](state, posts) {
     state.posts = posts;
-  }
+  },
+  [types.SET_DEFAULT_FOLDER](state, folder) {
+    state.folder = folder;
+  },
+  [types.SET_ALL_PROJECT](state, projects) {
+    state.projects = [...projects];
+  },
 }

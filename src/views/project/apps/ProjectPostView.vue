@@ -94,8 +94,9 @@
         this.comments = [...comments];
       },
       async loadPost(postId) {
+        //并行
+        this.loadComments(postId);
         this.post = await this.$api.post(postId);
-        await this.loadComments(postId);
       },
       async edit() {
 
@@ -127,7 +128,7 @@
         }
       }
     },
-    async mounted() {
+    mounted() {
       this.loadPost(this.postId);
     }
   }

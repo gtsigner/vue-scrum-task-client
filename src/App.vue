@@ -8,51 +8,74 @@
       <!--下拉-->
       <el-dropdown trigger="click">
         <span class="el-dropdown-link"><i class="ion ion-android-menu nav-toggle-teams"></i></span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>个人项目</el-dropdown-item>
+        <el-dropdown-menu class="drop-down-projects" slot="dropdown">
+          <p class="title">我的项目</p>
+          <el-dropdown-item v-for="p in projects" :key="p._id">
+            <span>{{p.title}}</span>
+          </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+
       <router-link class="navbar-brand" to="/">
-        OeyTeam
-        <small>为敏捷开发而生</small>
+        <small style="line-height: 30px;font-size:16px;">OeyTeam 为敏捷开发而生</small>
       </router-link>
       <div class="logo">
-        <img src="/static/logo.png" alt="">
+        <router-link to="/"><img src="/static/logo.png" alt=""></router-link>
       </div>
       <ul class="navbar-nav mr-auto"></ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="ion ion-help-circled"></i>
+          <a target="_blank" href="https://github.com/zhaojunlike" class="nav-link">
+            Github
           </a>
         </li>
-        <li class="nav-item"><span class="split-border border-left"></span></li>
         <li class="nav-item">
-          <a class="nav-link" href="#">
-            我的
+          <router-link :to="{path:'/'}" class="nav-link">
+            手册
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <a target="_blank" href="https://blog.oeynet.com" class="nav-link">
+            博客
           </a>
         </li>
-        <li class="nav-item"><span class="split-border border-left"></span></li>
         <li class="nav-item">
-          <a class="nav-link" href="#">
+          <router-link :to="{path:'/'}" class="nav-link">
+            团队
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link :to="{path:'/'}" class="nav-link">
             日程
-          </a>
+          </router-link>
         </li>
-        <li class="nav-item"><span class="split-border border-left"></span></li>
         <li class="nav-item">
-          <a class="nav-link" href="#">
+          <router-link :to="{path:'/'}" class="nav-link">
             通知
-          </a>
+          </router-link>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">
-            群聊
-          </a>
+          <router-link :to="{name:'user-my-info'}" class="nav-link">
+            我的
+          </router-link>
         </li>
         <li class="nav-item">
-          <a href="#">
-            <img :src="user.avatar" class="user-head-img" alt="">
-          </a>
+          <el-dropdown trigger="click">
+            <div class="el-dropdown-link">
+              <img :src="user.avatar" class="user-head-img" alt="">
+            </div>
+            <el-dropdown-menu class="drop-down-user" slot="dropdown">
+              <p class="title">我的项目</p>
+              <el-dropdown-item v-for="p in projects" :key="p._id">
+                <router-link :to="{path:'/'}">{{p.title}}</router-link>
+              </el-dropdown-item>
+              <el-dropdown-item
+                @click.native="logout"
+                class="footer-end" divided>
+                <span>注销登录</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </li>
       </ul>
     </nav>
@@ -77,6 +100,9 @@
       return {}
     },
     computed: {
+      projects() {
+        return this.$store.state.projects;
+      },
       appLoading() {
         return this.$store.state.appLoading;
       },
@@ -93,17 +119,20 @@
     components: {
       Loading
     },
-    methods: {},
+    methods: {
+      async logout() {
+        this.$router.replace({name: 'Login'});
+        this.$store.dispatch('logout');
+      }
+    },
     async mounted() {
       //初始话信息
       await this.$store.dispatch('loadLoginUser');
-      setTimeout(() => {
-        this.$store.commit('CHANGE_APP_LOADING', false);
-      }, 0);
+      this.$store.dispatch('loadAllProjects');
+      this.$store.commit('CHANGE_APP_LOADING', false);
       //这里去给用户授权
       this.$socket.emit('auth.login', {
-        action: '',
-        payload: {accessToken: this.$store.state.accessToken}
+        action: '', payload: {accessToken: this.$store.state.accessToken}
       });
     }
   }
@@ -119,6 +148,27 @@
     text-align: center;
     img {
       height: 30px;
+    }
+  }
+
+  .drop-down-projects, .drop-down-user {
+    min-height: 300px;
+    width: 200px;
+    .title {
+      font-size: 14px;
+      text-align: left;
+      padding-left: 20px;
+      line-height: 40px;
+      border-bottom: 1px solid $grey-200;
+      color: $grey-800;
+      margin: 0;
+    }
+  }
+
+  .drop-down-user {
+    width: 250px;
+    .footer-end {
+      margin-top: 200px;
     }
   }
 

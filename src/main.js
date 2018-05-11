@@ -11,8 +11,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.min.css'
 import './assets/scss/app.scss'
 import Api from './utils/api'
+import DayJs from 'dayjs'
 
-require('es6-promise').polyfill()
+require('es6-promise').polyfill();
 
 
 Vue.use(BootstrapVue);
@@ -33,8 +34,13 @@ import store from './store/index';
 // const FastClick = require('fastclick')
 // FastClick.attach(document.body)
 
-Vue.config.productionTip = false
-
+Vue.config.productionTip = false;
+Vue.filter('formatDateTime', (date, m = 'YYYY-MM-DD hh:mm:ss') => {
+  if (!date || date === '') {
+    return '-'
+  }
+  return DayJs(date).format(m);
+});
 
 /* eslint-disable no-new */
 const vm = new Vue({

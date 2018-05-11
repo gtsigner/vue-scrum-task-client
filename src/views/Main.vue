@@ -2,15 +2,15 @@
   <div>
     <div class="project-box" hidden>
       <i class="fa fa-plus"></i>
-      <p class="h3_title">个人项目</p>
+      <p class="h3_title">企业项目</p>
       <div class="text-center trash-none">
         <p><i class="ion ion-social-dropbox-outline"></i></p>
-        <p>暂无个人项目</p>
+        <p>暂无企业项目</p>
       </div>
     </div>
     <div class="project-box">
       <i class="fa fa-plus"></i>
-      <p class="h3_title">企业项目</p>
+      <p class="h3_title">个人项目</p>
       <b-card no-body class="project-card">
         <b-tabs pills card>
           <b-tab v-for="tb in tabChooseCategories"
@@ -73,6 +73,13 @@
                      placeholder="项目名称（必填）">
             </div>
             <div class="form-group">
+              <input type="text" class="form-control"
+                     name="title"
+                     v-model="newProject.name"
+                     required
+                     placeholder="英文标识（必填，生成后http://team.oeynet.com/oeynet）">
+            </div>
+            <div class="form-group">
               <textarea class="form-control" name="desc"
                         rows="2"
                         v-model="newProject.description"
@@ -123,6 +130,7 @@
         ],
         newProject: {
           title: '',
+          name: '',
           viewType: '',
           description: '',
           templateId: 0
@@ -153,6 +161,7 @@
       //创建项目
       async createProject() {
         let project = {
+          name: this.newProject.name,
           title: this.newProject.title,
           description: this.newProject.description,
           type: this.newProject.viewType,

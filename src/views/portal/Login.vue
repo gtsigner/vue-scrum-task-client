@@ -103,6 +103,7 @@
             let redirect = this.$route.query.redirect;
             redirect = redirect === undefined ? '/' : redirect;
             this.$router.replace({path: redirect});
+            return window.location.reload();
           } else {
             this.$notify({
               type: 'error',

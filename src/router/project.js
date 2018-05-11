@@ -11,6 +11,7 @@ import ProjectGroupChat from '@/views/project/ProjectGroupChat'
 import ProjectPosts from '@/views/project/ProjectPosts'
 //文件夹
 import ProjectCollection from '@/views/project/ProjectCollection'
+import ProjectCollectionView from '@/views/project/apps/ProjectCollectionView'
 //成员
 import ProjectMember from '@/views/project/ProjectMember'
 //可视化
@@ -19,6 +20,8 @@ import ProjectAnalytics from '@/views/project/ProjectAnalytics'
 import ProjectPostView from '@/views/project/apps/ProjectPostView'
 //源码
 import ProjectSourceView from '@/views/project/ProjectSource'
+import SourceRepositoryView from '@/views/project/SourceRepositoryView'
+import SourceRootView from '@/views/project/SourceRootView'
 
 const ProjectAppsView = [
   {
@@ -34,8 +37,15 @@ const ProjectAppsView = [
   },
   {
     name: 'ProjectCollection',
-    path: 'collections/:collectionId?',
-    component: ProjectCollection//文件
+    path: 'collections',
+    component: ProjectCollection,//文件
+    children: [
+      {
+        name: 'project-collection-view',
+        path: ':_collectionId',
+        component: ProjectCollectionView,//分享
+      }
+    ]
   },
   {
     name: 'ProjectMember',
@@ -60,12 +70,29 @@ export default [
       {
         name: 'ProjectView',
         path: '',
-        component: ProjectView//项目总览
+        component: ProjectView,//项目总览
+        redirect: {
+          name: 'ProjectAnalytics'
+        }
       },
+      /**
+       * 项目代码库
+       */
       {
-        name: 'ProjectSource',
         path: 'source',
-        component: ProjectSourceView//项目总览
+        component: ProjectSourceView,
+        children: [
+          {
+            name: 'project-source-root',
+            path: '',
+            component: SourceRootView,
+          },
+          {
+            name: 'source-repository',
+            path: 'repository/:resId',
+            component: SourceRepositoryView
+          }
+        ]
       },
       /*项目类型*/
       {
@@ -73,22 +100,13 @@ export default [
         path: 'task/normal/:_taskListId',
         component: ProjectNormal//普通项目模板
       },
-      /**/
       {
-        name: 'ProjectDemand',
-        path: 'demand',
-        component: ProjectDemand//敏捷开发需求
+        name: 'ProjectSmarty',
+        path: 'task/smarty/:_taskGroupId',
+        component: ProjectNormal,
+        children: []
       },
-      {
-        name: 'ProjectDefect',
-        path: 'defect',
-        component: ProjectDefect//敏捷开发缺陷
-      },
-      {
-        name: 'ProjectIteration',
-        path: 'iteration',
-        component: ProjectDefect//敏捷开发迭代
-      },
+
       {
         name: 'ProjectGroupChat',
         path: 'group_chat',

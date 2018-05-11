@@ -8,6 +8,10 @@ body {
   overflow: auto;
 }
 
+.color-primary {
+  color: $color-primary;
+}
+
 .btn-warning.focus,
 .btn-success:focus,
 .btn-primary:focus,
@@ -346,4 +350,11 @@ a:hover, a:focus, a:active {
 
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+
+.markdown-content {
+  img {
+    max-width: 100%;
+    overflow: hidden;
+  }
 }
