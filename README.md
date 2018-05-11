@@ -8,7 +8,10 @@
 https://github.com/zhaojunlike/laravel-scrum-dev-paas
 
 ## 演示
+- 由于并没做任何优化和CDN服务，加上服务器带宽很低所以请耐心等待一会
+
 http://www.oeyteam.com/
+
 
 
 ## Usage
