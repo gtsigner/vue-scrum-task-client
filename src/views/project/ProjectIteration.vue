@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="iteration-view">
     <div class="smart-group-view fade-in">
       <div class="agile-view">
         <div class="sprint-panel-wrapper"></div>
@@ -19,7 +19,7 @@
   import SwimTable from '../../components/SwimTable'
 
   export default {
-    name: 'ProjectDemand',
+    name: 'project-iteration',
     components: {
       SwimTable
     },

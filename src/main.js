@@ -13,6 +13,8 @@ import './assets/scss/app.scss'
 import Api from './utils/api'
 import DayJs from 'dayjs'
 
+const Config = require('./config')
+
 require('es6-promise').polyfill();
 
 
@@ -21,7 +23,7 @@ Vue.use(Notifications);
 Vue.use(ElementUI);
 
 //Socket
-Vue.use(VueSocket, "ws://team.oeynet.com", {
+Vue.use(VueSocket, Config.SOCKET_URI, {
   reconnection: true
 });
 Vue.prototype.$api = Api;

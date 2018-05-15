@@ -1,0 +1,4 @@
+{
+  "API_URI": "http://www.oeyteam.com/api/v1",
+  "SOCKET_URI": "ws://www.oeyteam.com"
+}

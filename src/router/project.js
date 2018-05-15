@@ -2,7 +2,7 @@ import Project from '@/views/project/Project'
 
 //Demand
 import ProjectDemand from '@/views/project/ProjectDemand'
-import ProjectDefect from '@/views/project/ProjectDefect'
+import ProjectIteration from '@/views/project/ProjectIteration'
 import ProjectView from '@/views/project/ProjectView'
 import ProjectNormal from '@/views/project/ProjectNormal'
 import ProjectGroupChat from '@/views/project/ProjectGroupChat'
@@ -101,9 +101,15 @@ export default [
         component: ProjectNormal//普通项目模板
       },
       {
-        name: 'ProjectSmarty',
+        name: 'project-smarty',
         path: 'task/smarty/:_taskGroupId',
-        component: ProjectNormal,
+        component: ProjectDemand,
+        children: []
+      },
+      {
+        name: 'project-iteration',
+        path: 'task/smarty/:_taskGroupId/sprint/all',
+        component: ProjectIteration,
         children: []
       },
 

@@ -33,11 +33,9 @@
       task: {}
     },
     methods: {
-      changeTaskStatus(task) {
+      async changeTaskStatus(task) {
         task.status = task.status === 1 ? 0 : 1;
-        Api.updateTask(task._id, task).then((res) => {
-
-        });
+        let res = await this.$api.instance().put(`tasks/${task._id}/status`, task);
         console.log(task);
       },
       moveTask() {

@@ -14,7 +14,7 @@
                               type="text"
                               v-model="user.username"
                               required
-                              placeholder="手机号">
+                              placeholder="手机号 / 用户名 / 邮箱">
                 </b-form-input>
               </b-form-group>
               <b-form-group id="password"
@@ -115,7 +115,7 @@
             redirect = redirect === undefined ? '/' : redirect;
             window.location.href = redirect;
           } else {
-            this.$notify({type: 'error', group: 'foo', title: '注册失败', text: res.message});
+            return this.$message.error(res.message);
           }
         } catch (e) {
 

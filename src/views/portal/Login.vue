@@ -14,7 +14,7 @@
                               type="text"
                               v-model="user.username"
                               required
-                              placeholder="手机号">
+                              placeholder="手机号 / 用户名 / 邮箱">
                 </b-form-input>
               </b-form-group>
               <b-form-group id="password"
@@ -105,12 +105,7 @@
             this.$router.replace({path: redirect});
             return window.location.reload();
           } else {
-            this.$notify({
-              type: 'error',
-              group: 'foo',
-              title: '登录失败',
-              text: res.message
-            });
+            return this.$message.error(res.message);
           }
         } catch (e) {
 

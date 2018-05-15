@@ -219,7 +219,7 @@
           this.menus.push({
             _id: g._id,
             title: g.title,
-            routeName: 'ProjectSmarty',
+            routeName: g.view.routeName,
             params: {
               '_projectId': res.taskList._projectId,
               '_taskListId': res.taskList._id,

@@ -170,10 +170,13 @@
         };
         try {
           this.isCreating = true;
-          let resProject = await  Api.createProject(project);
+          let resProject = await Api.createProject(project);
+          if (resProject.code === Api.ResCodes.FAIL) {
+            throw new Error(resProject.message);
+          }
           this.projects.push(resProject);
         } catch (e) {
-
+          this.$message.warning(e.message);
         } finally {
           this.isCreating = false;
           this.showCreateProjectModal = false;

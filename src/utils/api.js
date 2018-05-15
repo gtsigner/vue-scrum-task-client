@@ -3,8 +3,10 @@ import auth from './auth'
 import router from '@/router'
 import QueryString from 'querystring';
 
+const Config = require('../config');
+
 const configs = {
-  baseURL: 'http://www.oeyteam.com/api/v1',
+  baseURL: Config.API_URI,
   version: 'v1',
 }
 
@@ -94,7 +96,7 @@ const API_URLS = {
 export default {
   ResCodes: {
     'SUCCESS': 1001,
-    'FAIL': 1004,
+    'FAIL': 1002,
     'ERROR': 1003,
   },
   ApiUrls: API_URLS,

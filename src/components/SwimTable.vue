@@ -84,9 +84,10 @@
         </div>
       </div>
     </div>
-    <b-popover placement="bottom"
-               :show.sync="newTask.popover_show"
-               target="createTaskBox">
+    <b-popover
+      placement="bottom"
+      :show.sync="newTask.popover_show"
+      target="createTaskBox">
       <div class="board-menu-header" slot="title">
         <span>创建任务</span>
       </div>
