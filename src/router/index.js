@@ -5,6 +5,7 @@ import auth from '../utils/auth'
 import store from '../store/index'
 
 import Main from '@/views/Main'
+import TeamMain from '@/views/TeamMain'
 
 Vue.use(Router)
 
@@ -13,6 +14,14 @@ const rooter = [
     path: '/',
     name: 'Main',
     component: Main,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/team/:id',
+    name: 'team',
+    component: TeamMain,
     meta: {
       requiresAuth: true
     }

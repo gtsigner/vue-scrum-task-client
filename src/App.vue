@@ -30,11 +30,6 @@
           </a>
         </li>
         <li class="nav-item">
-          <router-link :to="{path:'/'}" class="nav-link">
-            手册
-          </router-link>
-        </li>
-        <li class="nav-item">
           <a target="_blank" href="https://blog.oeynet.com" class="nav-link">
             博客
           </a>
@@ -42,16 +37,6 @@
         <li class="nav-item">
           <router-link :to="{path:'/'}" class="nav-link">
             团队
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link :to="{path:'/'}" class="nav-link">
-            日程
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link :to="{path:'/'}" class="nav-link">
-            通知
           </router-link>
         </li>
         <li class="nav-item">
@@ -65,9 +50,13 @@
               <img :src="user.avatar" class="user-head-img" alt="">
             </div>
             <el-dropdown-menu class="drop-down-user" slot="dropdown">
-              <p class="title">我的项目</p>
-              <el-dropdown-item v-for="p in projects" :key="p._id">
-                <router-link :to="{path:'/'}">{{p.title}}</router-link>
+              <p class="title">我的团队</p>
+              <el-dropdown-item
+                @click.native="team.show = true">
+                <span>创建我的团队</span>
+              </el-dropdown-item>
+              <el-dropdown-item v-for="p in teams" :key="p._id">
+                <router-link :to="{path:`/team/${p._id}`}">{{p.team.name}}</router-link>
               </el-dropdown-item>
               <el-dropdown-item
                 @click.native="logout"
@@ -86,6 +75,35 @@
       <i class="el-icon-loading"></i>
       <h4><span></span>Dashboard is loading ...</h4>
     </div>
+    <!--创建团队碳层-->
+    <el-dialog
+      title="创建团队"
+      :visible.sync="team.show"
+      width="20%">
+      <div>
+        <div class="header text-center">
+          <p>
+            <img style="height: 100px;"
+                 src="https://dn-st.teambition.net/teambition/images/illustration@3x.2d8d2cc3.png" alt="">
+          </p>
+          <small class="mt-2 color-gary">创建团队，解锁团队独有功能</small>
+        </div>
+        <el-form :inline="true" :model="team" class="mt-3">
+          <el-input v-model="team.name" placeholder="团队名称"></el-input>
+          <el-select style="width: 100%" class="mt-3" v-model="team.region" placeholder="选择团队规模">
+            <el-option label="1-10人" value="1-10人"></el-option>
+            <el-option label="10-50人" value="10-50人"></el-option>
+            <el-option label="50-100人" value="50-100人"></el-option>
+            <el-option label="100-1000人" value="100-1000人"></el-option>
+          </el-select>
+        </el-form>
+
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="team.show = false">取 消</el-button>
+        <el-button type="primary" @click="createTeam">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -97,7 +115,14 @@
 
   export default {
     data() {
-      return {}
+      return {
+        //团队规模
+        team: {
+          name: '',
+          region: '',
+          show: false
+        }
+      }
     },
     computed: {
       projects() {
@@ -112,6 +137,9 @@
       project() {
 
       },
+      teams() {
+        return this.$store.state.teams;
+      },
       user() {
         return this.$store.state.user;
       }
@@ -120,6 +148,20 @@
       Loading
     },
     methods: {
+      async createTeam() {
+
+        let team = {
+          name: this.team.name,
+          region: this.team.region
+        };
+        let res = await this.$api.instance().post('team', team);
+        if (res.code === this.$api.ResCodes.FAIL) {
+          this.$message.error(res.message);
+        } else {
+
+        }
+        this.team.show = false;
+      },
       async logout() {
         this.$router.replace({name: 'Login'});
         this.$store.dispatch('logout');
@@ -129,6 +171,7 @@
       //初始话信息
       await this.$store.dispatch('loadLoginUser');
       this.$store.dispatch('loadAllProjects');
+      this.$store.dispatch('loadAllTeams');
       this.$store.commit('CHANGE_APP_LOADING', false);
       //这里去给用户授权
       this.$socket.emit('auth.login', {

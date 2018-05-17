@@ -59,14 +59,6 @@
             </b-form>
           </div>
           <div class="partner-login-main">
-            <b-button size='lg'
-                      class="wechat-login-button"
-                      :block="true"
-                      @click="loginByWeChat"
-                      type="button" variant="success">
-              <span>使用 微信 注册</span>
-              <i></i>
-            </b-button>
             <p class="link-reg-new">
               <span class="color-gary">已经有账号了？</span>
               <router-link to="/portal/login">登录账号</router-link>

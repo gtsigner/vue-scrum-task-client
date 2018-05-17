@@ -45,6 +45,15 @@ export default {
     let res = await Api.projects();
     commit(types.SET_ALL_PROJECT, res)
   },
+  /**
+   * 获取所有团队列表
+   * @param commit
+   * @returns {Promise<void>}
+   */
+  async loadAllTeams({commit}) {
+    let res = await Api.instance().get('team/all');
+    commit(types.SET_ALL_TEAMS, res)
+  },
   //加载用户基本信息
   async loadLoginUser({commit}) {
     let res = await Api.me();

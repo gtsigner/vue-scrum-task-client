@@ -89,6 +89,7 @@
           'sort': this.taskStages.length
         };
         let res = await Api.createTaskStage(stage);
+        this.newStage.name = '';
         this.$store.dispatch('addTaskStages', res);
       }
     },

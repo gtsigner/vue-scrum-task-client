@@ -9,7 +9,18 @@
           <span class="task-count" v-html="tasks.length"></span>
         </div>
         <div>
-          <i class="ion ion-android-arrow-dropdown-circle board-stage-menu"></i>
+          <el-dropdown trigger="click">
+            <div class="el-dropdown-link">
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </div>
+            <el-dropdown-menu slot="dropdown" class="task-stage-menu-wrapper">
+              <div class="header">
+                <p class="text-center">项目阶段</p>
+              </div>
+              <el-dropdown-item divided @click.native="edit"><i class="el-icon-edit"></i> 编辑阶段</el-dropdown-item>
+              <el-dropdown-item @click.native="remove" divided><i class="el-icon-close"></i> 删除阶段</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
       </div>
     </header>
@@ -108,6 +119,34 @@
       }
     },
     methods: {
+      async edit() {
+        const _self = this;
+        this.$prompt('请输入新阶段名称', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(async ({value}) => {
+          let res = await this.$api.instance().put(`taskStage/${this.stage._id}`, {
+            _id: this.stage._id,
+            name: value
+          });
+          this.$message.success(res.message);
+          this.$store.commit('UPDATE_STAGE', {
+            _id: this.stage._id,
+            name: value
+          });
+        });
+      },
+      async remove() {
+        this.isLoading = true;
+        let res = await this.$api.instance().delete(`taskStage/${this.stage._id}`);
+        if (res.code === this.$api.ResCodes.FAIL) {
+          this.$message.error(res.message);
+        } else {
+          this.$message.success(res.message);
+          this.$store.commit('REMOVE_STAGE', this.stage);
+        }
+        this.isLoading = false;
+      },
       sort(ele) {
       },
       choose(ele) {
@@ -258,6 +297,12 @@
         flex: 0 0 auto;
         transition: -webkit-transform 218ms ease-in-out, opacity 100ms;
       }
+    }
+  }
+
+  .task-stage-menu-wrapper {
+    width: 200px;
+    .header {
     }
   }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="analytics-view thin-scroll">
     <div class="container main-wrapper">
+      <loading v-if="isLoading"></loading>
       <div class="board-wrapper">
         <!--<p class="board-title">任务概况</p>-->
         <div class="row task-total">
@@ -31,26 +32,34 @@
 
 <script>
   import HighCharts from 'highcharts';
+  import Loading from '../../components/Loading'
 
   export default {
     name: "project-analytics",
-    data() {
-      return {
-        totals: [
-          {title: '未完成', count: 1, rate: 10, color: '#77C2F8'},
-          {title: '已完成', count: 3, rate: 24, color: '#9ED979'},
-          {title: '任务总量', count: 5, rate: 20, color: '#77C2F8'},
-          {title: '今日到期', count: 3, rate: 80, color: '#ff0a05'},
-          {title: '已逾期', count: 2, rate: 70, color: '#ff5b0f'},
-          {title: '待认领', count: 4, rate: 50, color: '#FFC774'},
-          {title: '按时完成', count: 6, rate: 12, color: '#9ED979'},
-          {title: '逾期完成', count: 6, rate: 40, color: '#ff7e09'},
-        ],
+    comments: {
+      Loading
+    },
+    computed: {
+      project() {
+        return this.$store.state.project;
       }
     },
-    methods: {},
-    created() {
-
+    data() {
+      return {
+        isLoading: false,
+        totals: [],
+      }
+    },
+    methods: {
+      async getTotal() {
+        this.isLoading = true;
+        let res = await this.$api.instance().get(`projects/${this.project._id}/total`);
+        this.totals = [...res]
+        this.isLoading = false;
+      }
+    },
+    activated() {
+      this.getTotal();
     },
     mounted() {
       var chart = HighCharts.chart('taskChart', {

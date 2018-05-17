@@ -206,6 +206,7 @@
           let res = await Api.createPost({...post, type: 'posts.project'});
           this.showCreator = false;
         }
+        this.loadData();
       },
       /*当是创建Post的时候*/
       createPost() {
@@ -221,16 +222,19 @@
           this.postId = this.posts[0]._id;
           this.$router.replace({name: 'ProjectPostView', params: {postId: this.postId}});
         }
+      },
+      async loadData() {
+        //获取分享资料列表
+        await this.$store.dispatch('loadProjectPost', this.project._id);
+        this.isLoading = false;
+        this.chooseDefault();
       }
     },
     async activated() {
       this.chooseDefault();
     },
     async mounted() {
-      //获取分享资料列表
-      await this.$store.dispatch('loadProjectPost', this.project._id);
-      this.isLoading = false;
-      this.chooseDefault();
+      this.loadData();
     },
     data() {
       return {

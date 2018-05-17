@@ -1,3 +1,7 @@
 node_modules
 .idea
 dist
+package-lock.json
+yarn-error.log
+screenshots
+docs

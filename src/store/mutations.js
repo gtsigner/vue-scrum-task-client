@@ -15,6 +15,22 @@ export default {
   [types.ADD_TASK_STAGES](state, stage) {
     state.taskStages.push(stage);
   },
+  [types.REMOVE_STAGE](state, stage) {
+    let stages = [];
+    state.taskStages.forEach((s) => {
+      if (s._id != stage._id) {
+        stages.push(s);
+      }
+    });
+    state.taskStages = [...stages];
+  },
+  [types.UPDATE_STAGE](state, stage) {
+    state.taskStages.forEach((s) => {
+      if (s._id == stage._id) {
+        s.name = stage.name;
+      }
+    });
+  },
   [types.SET_USER_PROFILE](state, user) {
     state.user = user;
   },
@@ -35,5 +51,8 @@ export default {
   },
   [types.SET_ALL_PROJECT](state, projects) {
     state.projects = [...projects];
+  },
+  [types.SET_ALL_TEAMS](state, teams) {
+    state.teams = [...teams];
   },
 }

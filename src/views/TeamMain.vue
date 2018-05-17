@@ -1,23 +1,15 @@
 <template>
-  <div>
-    <div class="project-box" hidden>
-      <i class="fa fa-plus"></i>
-      <p class="h3_title">企业项目</p>
-      <div class="text-center trash-none">
-        <p><i class="ion ion-social-dropbox-outline"></i></p>
-        <p>暂无企业项目</p>
-      </div>
-    </div>
+  <div class="team-main-view">
     <div class="project-box">
       <i class="fa fa-plus"></i>
-      <p class="h3_title">个人项目</p>
+      <p class="h3_title">企业项目 - <span v-html="team.name"></span></p>
       <b-card no-body class="project-card">
         <b-tabs pills card>
           <b-tab v-for="tb in tabChooseCategories"
                  :key="tb.type" :title="tb.title" :active="tb.active">
             <div class="tb-content row">
               <div class="col-4" v-for="project in projects" :key="project._id"
-                   v-if="(tb.filter(project,user))">
+                   v-if="(project.type===tb.type||tb.type===0)">
                 <router-link :to="{name:'ProjectView',params:{_projectId: project._id}}">
                   <div class="project-detail-box"
                        :style="{
@@ -118,27 +110,14 @@
   import Api from '../utils/api'
 
   export default {
+    name: 'team-main',
     data() {
       return {
         isCreating: false,
         showCreateProjectModal: false,
         isLoading: true,
         tabChooseCategories: [
-          {
-            title: '全部', filter() {
-              return true
-            }, active: true
-          },
-          {
-            title: '发起的项目', filter(project, user) {
-              return user._id.toString() === project._creatorId;
-            }, active: false
-          },
-          {
-            title: '参与的项目', filter(project, user) {
-              return user._id.toString() !== project._creatorId;
-            }, active: false
-          }
+          {title: '全部', type: 0, active: true}
         ],
         newProject: {
           title: '',
@@ -148,24 +127,31 @@
           templateId: 0
         },
         projects: [],
+        teamId: this.$route.params.id,
+        team: {
+          name: 'loading'
+        }
       }
     },
     watch: {},
     computed: {
-      user() {
-        return this.$store.state.user;
+      teams() {
+        return this.$store.state.teams;
       }
     },
     components: {},
     methods: {
       //获取所有项目
       async getMyProjects() {
-        let res = await Api.projects();
+        this.isLoading = true;
+        let res = await this.$api.instance().get(`projects?_teamId=${this.teamId}`);
         this.projects = [...res];
+        this.isLoading = false;
       },
       //创建项目
       async createProject() {
         let project = {
+          _teamId: this.teamId,
           name: this.newProject.name,
           title: this.newProject.title,
           description: this.newProject.description,
@@ -186,10 +172,19 @@
           this.isCreating = false;
           this.showCreateProjectModal = false;
         }
+      },
+      async getTeam() {
+        let len = this.teams.length;
+        for (let i = 0; i < len; i++) {
+          if (this.teams[i]._id.toString() === this.teamId) {
+            this.team = {...this.teams[i].team};
+          }
+        }
       }
     },
     async created() {
       this.getMyProjects();
+      this.getTeam();
     },
     socket: {
       events: {

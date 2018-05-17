@@ -11,6 +11,7 @@ import getters from './getters'
 
 let state = {
   projects: [],//所有项目
+  teams: [],//所有团队
   project: {
     _id: '',
     title: 'loading'
