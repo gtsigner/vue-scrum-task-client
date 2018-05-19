@@ -22,6 +22,7 @@ import ProjectPostView from '@/views/project/apps/ProjectPostView'
 import ProjectSourceView from '@/views/project/ProjectSource'
 import SourceRepositoryView from '@/views/project/SourceRepositoryView'
 import SourceRootView from '@/views/project/SourceRootView'
+import TaskNormalDetail from '@/views/project/task/Detail';
 
 const ProjectAppsView = [
   {
@@ -98,7 +99,17 @@ export default [
       {
         name: 'ProjectNormal',
         path: 'task/normal/:_taskListId',
-        component: ProjectNormal//普通项目模板
+        component: ProjectNormal,//普通项目模板
+        children: [
+          {
+            path: ''
+          },
+          {
+            name: 'task-normal-detail',
+            path: 'task/:_taskId',
+            component: TaskNormalDetail
+          }
+        ]
       },
       {
         name: 'project-smarty',

@@ -3,6 +3,7 @@
     <div class="project-box">
       <i class="fa fa-plus"></i>
       <p class="h3_title">企业项目 - <span v-html="team.name"></span></p>
+      <loading v-if="isLoading"></loading>
       <b-card no-body class="project-card">
         <b-tabs pills card>
           <b-tab v-for="tb in tabChooseCategories"
@@ -108,9 +109,21 @@
 </template>
 <script>
   import Api from '../utils/api'
+  import Loading from '../components/Loading';
 
   export default {
     name: 'team-main',
+    components: {
+      Loading
+    },
+    computed: {
+      teamId() {
+        return this.$route.params.id;
+      },
+      teams() {
+        return this.$store.state.teams;
+      }
+    },
     data() {
       return {
         isCreating: false,
@@ -127,19 +140,17 @@
           templateId: 0
         },
         projects: [],
-        teamId: this.$route.params.id,
         team: {
           name: 'loading'
         }
       }
     },
-    watch: {},
-    computed: {
-      teams() {
-        return this.$store.state.teams;
+    watch: {
+      ['teamId']() {
+        this.getMyProjects();
+        this.getTeam();
       }
     },
-    components: {},
     methods: {
       //获取所有项目
       async getMyProjects() {

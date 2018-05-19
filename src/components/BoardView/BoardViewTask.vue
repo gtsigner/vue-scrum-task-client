@@ -1,5 +1,5 @@
 <template>
-  <div class="task task-card task-item">
+  <div class="task task-card task-item" @click="openTask">
     <!--优先级-->
     <div class="task-priority-wrapper">
       <div class="task-priority-view">
@@ -33,6 +33,14 @@
       task: {}
     },
     methods: {
+      async openTask() {
+        this.$router.replace({
+          name: 'task-normal-detail',
+          params: {
+            _taskId: this.task._id
+          }
+        })
+      },
       async changeTaskStatus(task) {
         task.status = task.status === 1 ? 0 : 1;
         let res = await this.$api.instance().put(`tasks/${task._id}/status`, task);

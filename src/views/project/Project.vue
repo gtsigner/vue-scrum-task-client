@@ -68,6 +68,7 @@
     <!--Modal组件-->
     <component :is="modal" v-for="(modal,index) in modals" :key="index" @close="closeModal"></component>
 
+    <!--团队成员管理-->
     <el-dialog class="new-member-dialog" title="邀请新成员" :visible.sync="showMemberDialog">
       <div class="search-form">
         <div class="form-group">
@@ -93,8 +94,6 @@
 </template>
 
 <script>
-  import Api from '@/utils/api'
-  import Auth from '@/utils/auth'
 
   import Loading from '@/components/Loading'
   import ProjectManagePanel from '@/components/ProjectManagePanel'

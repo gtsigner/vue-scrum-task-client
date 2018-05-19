@@ -40,7 +40,7 @@
                   <div class="menu-list">
                     <h5 class="header">成员管理</h5>
                     <div class="menu-item cursor-pointer">配置权限</div>
-                    <div class="menu-item danger cursor-pointer">移除成员</div>
+                    <div @click="removeMember(m)" class="menu-item danger cursor-pointer">移除成员</div>
                   </div>
                   <span slot="reference"><i class="ion ion-ios-arrow-down"></i></span>
                 </el-popover>
@@ -96,6 +96,15 @@
       },
       close() {
         this.$emit('update:show', false)
+      },
+      async removeMember(member) {
+        this.isLoading = true;
+        await this.$api.instance().delete(`project/${this.project._id}/member/remove/${member._id}`);
+        await this.loadMembers();
+        this.isLoading = false;
+      },
+      async setting() {
+
       },
       async loadMembers() {
         this.isLoading = true;

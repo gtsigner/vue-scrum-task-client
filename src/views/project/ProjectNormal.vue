@@ -32,6 +32,10 @@
         </div>
       </draggable>
     </div>
+    <!--详情面板-->
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 

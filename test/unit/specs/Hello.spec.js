@@ -8,4 +8,4 @@ describe('Hello.vue', () => {
     expect(vm.$el.querySelector('.hello h1').textContent)
       .to.equal('Welcome to Your Vue.js App')
   })
-})
+});

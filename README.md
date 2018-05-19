@@ -17,6 +17,10 @@ http://www.oeyteam.com/
 ## Usage
 
 
+## jenkins
+http://localhost:8080/job/oeyteam-front-devops/build?token=oeyteam
+
+
 ## 技术栈
 - vue
 - vuex
