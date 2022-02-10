@@ -84,7 +84,7 @@
     "mockjs": "^1.0.1-beta3",
     "nightwatch": "^0.9.12",
     "node-fetch": "^2.1.1",
-    "node-sass": "^4.7.2",
+    "node-sass": "^7.0.0",
     "opn": "^5.1.0",
     "optimize-css-assets-webpack-plugin": "^2.0.0",
     "ora": "^1.2.0",
